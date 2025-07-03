@@ -1,0 +1,1136 @@
+
+<!DOCTYPE html>
+<html lang="en" class="bg-gray-100">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dr.Net Admin Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body onload="initDashboard()" class="flex min-h-screen bg-gradient-to-br from-gray-100 via-purple-50 to-indigo-100">
+  <!-- Sidebar -->
+  <aside class="w-72 h-screen bg-gradient-to-b from-indigo-900 via-purple-800 to-gray-900 shadow-2xl flex flex-col text-white">
+    <div class="p-6 border-b border-gray-700">
+      <h2 class="text-2xl font-extrabold tracking-wide">Dr.Net Admin</h2>
+      <p class="text-sm text-gray-300 mt-1">Julius - CTO</p>
+    </div>
+    <nav class="p-4 space-y-4 flex-1">
+      <button onclick="navigateTo('dashboard')" class="w-full text-left py-3 px-4 rounded-lg bg-white/20 shadow-lg">
+        📊 <span class="ml-3 font-medium">Dashboard</span>
+      </button>
+      <button onclick="navigateTo('register-user')" class="w-full text-left py-3 px-4 rounded-lg hover:bg-white/20">
+        ➕ <span class="ml-3 font-medium">Register User</span>
+      </button>
+      <button onclick="navigateTo('manage-users')" class="w-full text-left py-3 px-4 rounded-lg hover:bg-white/20">
+        👥 <span class="ml-3 font-medium">Manage Users</span>
+      </button>
+      <button onclick="navigateTo('renewals')" class="w-full text-left py-3 px-4 rounded-lg hover:bg-white/20">
+        🔄 <span class="ml-3 font-medium">Renewals</span>
+      </button>
+      <button onclick="navigateTo('website-bookings')" class="w-full text-left py-3 px-4 rounded-lg hover:bg-white/20">
+        🌐 <span class="ml-3 font-medium">Website Bookings</span>
+      </button>
+    </nav>
+    <div class="p-4 border-t border-gray-700">
+      <button onclick="logout()" class="w-full bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">
+        🚪 Log Out
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 p-6 overflow-y-auto">
+    <div id="notificationBox" class="hidden mb-6 bg-yellow-100 text-yellow-800 p-4 rounded-lg shadow-md">
+      ⚠️ Some users are expiring soon. <a href="#" onclick="showDetailedView('expired')" class="underline">View Now</a>
+    </div>
+
+    <!-- Dashboard Section -->
+    <section id="dashboard">
+      <h2 class="text-3xl font-bold text-indigo-800 mb-6">Julius@shadoWalker</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div onclick="showDetailedView('users')" class="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white p-5 rounded-xl shadow-lg hover:scale-105 cursor-pointer transition-transform">
+          <p class="text-indigo-100">Total Users</p>
+          <p class="text-3xl font-bold" id="totalUsers">0</p>
+        </div>
+        <div onclick="showDetailedView('active')" class="bg-gradient-to-r from-green-500 to-green-600 text-white p-5 rounded-xl shadow-lg hover:scale-105 cursor-pointer transition-transform">
+          <p class="text-green-100">Active Users</p>
+          <p class="text-3xl font-bold" id="activeUsers">0</p>
+        </div>
+        <div onclick="showDetailedView('expired')" class="bg-gradient-to-r from-red-500 to-red-600 text-white p-5 rounded-xl shadow-lg hover:scale-105 cursor-pointer transition-transform">
+          <p class="text-red-100">Expired Users</p>
+          <p class="text-3xl font-bold" id="expiredUsers">0</p>
+        </div>
+        <div onclick="showDetailedView('monthly-income')" class="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white p-5 rounded-xl shadow-lg hover:scale-105 cursor-pointer transition-transform">
+          <p class="text-yellow-100">Monthly Income (<span id="currentMonthName"></span>)</p>
+          <p class="text-3xl font-bold" id="monthlyIncome">Ksh 0</p>
+          <p class="text-xs text-yellow-100 mt-1" id="monthlyIncomeDetails"></p>
+        </div>
+        <div onclick="showDetailedView('router')" class="bg-gradient-to-r from-pink-500 to-pink-600 text-white p-5 rounded-xl shadow-lg hover:scale-105 cursor-pointer transition-transform">
+          <p class="text-pink-100">Router Revenue</p>
+          <p class="text-3xl font-bold" id="routerRevenue">Ksh 0</p>
+        </div>
+        <div onclick="showDetailedView('bookings')" class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-5 rounded-xl shadow-lg hover:scale-105 cursor-pointer transition-transform">
+          <p class="text-blue-100">Bookings</p>
+          <p class="text-3xl font-bold" id="totalBookings">0</p>
+        </div>
+      </div>
+
+      <!-- Income Chart -->
+      <div class="mt-8 bg-white rounded-xl shadow-lg p-6">
+        <h3 class="text-xl font-bold text-indigo-800 mb-4">Income Trend (Monthly)</h3>
+        <canvas id="incomeChart" height="120"></canvas>
+      </div>
+
+      <!-- Detailed View Container -->
+      <div id="detailedViewContainer" class="mt-8 hidden">
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <div class="flex justify-between items-center mb-4">
+            <h3 id="detailedViewTitle" class="text-2xl font-bold text-indigo-800"></h3>
+            <button onclick="hideDetailedView()" class="text-gray-500 hover:text-gray-700 text-xl font-bold">&times;</button>
+          </div>
+          <div id="detailedViewContent" class="overflow-x-auto"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Register User Section -->
+    <section id="register-user" class="hidden mt-6">
+      <h3 class="text-2xl font-bold text-indigo-700 mb-4">Register New User</h3>
+      <form id="registerForm" class="space-y-4 bg-white p-6 rounded-xl shadow-lg" onsubmit="submitUserForm(event)">
+        <input name="name" placeholder="Full Name" class="w-full p-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200" required />
+        <input name="location" placeholder="Location" class="w-full p-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200" required />
+        <input name="phone" placeholder="Phone Number" class="w-full p-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200" required />
+        <input name="subscriptionAmount" type="number" placeholder="Subscription Amount" class="w-full p-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200" required />
+        <input name="routerCost" type="number" placeholder="Router Cost (0 if none)" class="w-full p-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200" required />
+        <input name="paymentDate" type="date" class="w-full p-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200" required />
+
+        <div class="flex items-center space-x-2">
+          <input type="checkbox" id="paidSubscription" name="paidSubscription" class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+          <label for="paidSubscription" class="text-gray-700">Has the user paid the subscription?</label>
+        </div>
+
+        <div class="mb-4">
+          <label for="package" class="block font-semibold text-gray-800 mb-1 text-sm">Select Internet Package</label>
+          <select name="package" id="package" required class="w-full px-3 py-2 rounded-lg border border-pink-300 shadow focus:ring-4 focus:ring-pink-400 focus:outline-none text-sm">
+            <option value="" disabled selected>Choose a Package</option>
+            <option>Bronze Plan - Up to 5 Mbps (Ksh 1,500/Month)</option>
+            <option>Silver Plan - Up to 10 Mbps (Ksh 2,000/Month)</option>
+            <option>Gold Plan - Up to 15 Mbps (Ksh 2,500/Month)</option>
+            <option>Platinum Plan - Up to 20 Mbps (Ksh 3,000/Month)</option>
+            <option>Super Plan - Up to 35 Mbps (Ksh 4,500/Month)</option>
+            <option>Dedicated Link - Up to 200 Mbps (Contact for Quote)</option>
+          </select>
+        </div>
+
+        <button type="submit" class="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg hover:bg-indigo-700 transition-colors font-medium">
+          Register User
+        </button>
+      </form>
+    </section>
+
+    <!-- Manage Users Section -->
+    <section id="manage-users" class="hidden mt-6">
+      <h3 class="text-2xl font-bold text-indigo-700 mb-4">Manage Users</h3>
+      <button onclick="exportToCSV()" class="mb-4 bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600">
+        📥 Export Users to CSV
+      </button>
+      <div id="manageUserList" class="space-y-3"></div>
+    </section>
+
+    <!-- Renewals Section -->
+    <section id="renewals" class="hidden mt-6">
+      <h3 class="text-2xl font-bold text-indigo-700 mb-4">Renewal Management</h3>
+      
+      <!-- Quick Renewal Form -->
+      <div class="bg-white p-6 rounded-xl shadow-lg mb-6">
+        <h4 class="text-lg font-semibold text-indigo-700 mb-4">🔄 Quick User Renewal</h4>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Select User</label>
+            <select id="renewalUserSelect" class="w-full p-2 border rounded-md">
+              <option value="">Choose a user...</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Renewal Amount (Ksh)</label>
+            <input type="number" id="renewalAmount" placeholder="Enter amount" class="w-full p-2 border rounded-md">
+          </div>
+          <div class="flex items-end">
+            <button onclick="processQuickRenewal()" class="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition">
+              🔄 Renew Now
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Expiring Soon Users -->
+      <div id="expiringSoonSection" class="bg-yellow-50 border border-yellow-200 p-6 rounded-xl shadow-lg mb-6 hidden">
+        <h4 class="text-lg font-semibold text-yellow-700 mb-4">📅 Users Expiring Soon (Next 5 Days)</h4>
+        <div id="expiringSoonList" class="space-y-3"></div>
+      </div>
+
+      <!-- Dormant Users -->
+      <div id="dormantUsersSection" class="bg-red-50 border border-red-200 p-6 rounded-xl shadow-lg mb-6 hidden">
+        <h4 class="text-lg font-semibold text-red-700 mb-4">👥 Dormant Users (Expired & No Recent Activity)</h4>
+        <div id="dormantUsersList" class="space-y-3"></div>
+      </div>
+
+      <!-- Current Month Renewals Summary -->
+      <div class="bg-white p-6 rounded-xl shadow-lg">
+        <h4 class="text-lg font-semibold text-indigo-700 mb-4">💰 <span id="currentMonthRenewals"></span> Renewals Summary</h4>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div class="text-center p-4 bg-green-50 rounded-lg">
+            <p class="text-2xl font-bold text-green-600" id="renewalsCount">0</p>
+            <p class="text-sm text-gray-600">Renewals This Month</p>
+          </div>
+          <div class="text-center p-4 bg-blue-50 rounded-lg">
+            <p class="text-2xl font-bold text-blue-600" id="renewalsRevenue">Ksh 0</p>
+            <p class="text-sm text-gray-600">Total Revenue</p>
+          </div>
+          <div class="text-center p-4 bg-yellow-50 rounded-lg">
+            <p class="text-2xl font-bold text-yellow-600" id="renewalsAverage">0</p>
+            <p class="text-sm text-gray-600">Average Per Renewal</p>
+          </div>
+        </div>
+        
+        <hr class="my-4">
+        
+        <div>
+          <h5 class="font-semibold mb-2">Recent Renewals</h5>
+          <div id="recentRenewalsList" class="space-y-2"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Website Bookings Section -->
+    <section id="website-bookings" class="hidden mt-6">
+      <h3 class="text-2xl font-bold text-indigo-700 mb-4">Website Bookings</h3>
+      <div class="mb-4">
+        <button onclick="refreshBookings()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+          🔄 Refresh Bookings
+        </button>
+      </div>
+      <div id="bookingList" class="space-y-4"></div>
+    </section>
+  </main>
+
+  <script>
+    const BASE_URL = 'http://localhost:5000';
+    let users = [], bookings = [], renewals = [];
+
+    async function initDashboard() {
+      await fetchData();
+      renderDashboard();
+      renderManageUsers();
+      renderRenewals();
+      renderBookings();
+    }
+
+    async function fetchData() {
+      try {
+        const [usersRes, bookingsRes] = await Promise.all([
+          fetch(`${BASE_URL}/api/users`),
+          fetch(`${BASE_URL}/api/bookings`)
+        ]);
+        users = await usersRes.json();
+        bookings = await bookingsRes.json();
+        
+        // Initialize renewals from users data if no separate renewals endpoint
+        renewals = users
+          .filter(u => u.paidSubscription && u.paymentDate)
+          .map(u => ({
+            _id: u._id + '_renewal',
+            userId: u._id,
+            userName: u.name,
+            amount: parseFloat(u.subscriptionAmount),
+            renewalDate: u.paymentDate,
+            expiryDate: u.expiryDate,
+            month: dayjs(u.paymentDate).format('MMMM'),
+            year: dayjs(u.paymentDate).year(),
+            isDeleted: false
+          }));
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        users = [];
+        bookings = [];
+        renewals = [];
+      }
+    }
+
+    function getCurrentMonthIncome() {
+      const currentMonth = dayjs().format('MMMM');
+      const currentYear = dayjs().year();
+      
+      return renewals
+        .filter(renewal => 
+          renewal.month === currentMonth && 
+          renewal.year === currentYear && 
+          !renewal.isDeleted
+        )
+        .reduce((total, renewal) => total + renewal.amount, 0);
+    }
+
+    function checkExpiries() {
+      const soonExpiring = users.filter(u =>
+        u.expiryDate && dayjs(u.expiryDate).diff(dayjs(), 'day') <= 5 &&
+        dayjs(u.expiryDate).isAfter(dayjs())
+      );
+
+      const box = document.getElementById("notificationBox");
+      if (soonExpiring.length > 0) {
+        box.classList.remove("hidden");
+      } else {
+        box.classList.add("hidden");
+      }
+    }
+
+    function exportToCSV() {
+      const headers = ["Name", "Phone", "Location", "Subscription", "Paid", "Router Cost", "Payment Date", "Expiry Date"];
+      const rows = users.map(u => [
+        u.name, u.phone, u.location, u.subscriptionAmount, u.paidSubscription ? "Yes" : "No",
+        u.routerCost, u.paymentDate, u.expiryDate
+      ]);
+
+      let csv = headers.join(",") + "\n" + rows.map(r => r.join(",")).join("\n");
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "drnet_users.csv";
+      link.click();
+    }
+
+    function renderDashboard() {
+      checkExpiries();
+      drawIncomeChart();
+
+      const currentMonth = dayjs().format('MMMM');
+      const monthlyIncome = getCurrentMonthIncome();
+      const renewalCount = renewals.filter(r => 
+        r.month === currentMonth && 
+        r.year === dayjs().year() && 
+        !r.isDeleted
+      ).length;
+
+      // Calculate router revenue
+      const routerRevenue = users.reduce((sum, u) => sum + (parseFloat(u.routerCost) || 0), 0);
+
+      document.getElementById("totalUsers").textContent = users.filter(u => !u.isDeleted).length;
+      document.getElementById("activeUsers").textContent = users.filter(u => dayjs(u.expiryDate).isAfter(dayjs()) && !u.isDeleted).length;
+      document.getElementById("expiredUsers").textContent = users.filter(u => dayjs(u.expiryDate).isBefore(dayjs()) && !u.isDeleted).length;
+      document.getElementById("monthlyIncome").textContent = `Ksh ${monthlyIncome.toLocaleString()}`;
+      document.getElementById("currentMonthName").textContent = currentMonth;
+      document.getElementById("monthlyIncomeDetails").textContent = `${renewalCount} renewals this month`;
+      document.getElementById("routerRevenue").textContent = `Ksh ${routerRevenue.toLocaleString()}`;
+      document.getElementById("totalBookings").textContent = bookings.length;
+    }
+
+    function renderRenewals() {
+      const currentMonth = dayjs().format('MMMM YYYY');
+      document.getElementById("currentMonthRenewals").textContent = currentMonth;
+
+      // Populate renewal user select
+      const select = document.getElementById("renewalUserSelect");
+      select.innerHTML = '<option value="">Choose a user...</option>';
+      users.filter(u => !u.isDeleted).forEach(user => {
+        const option = document.createElement('option');
+        option.value = user._id;
+        option.textContent = `${user.name} - ${user.phone}`;
+        select.appendChild(option);
+      });
+
+      // Render expiring soon users
+      const expiringSoon = users.filter(u => 
+        !u.isDeleted &&
+        dayjs(u.expiryDate).diff(dayjs(), 'days') <= 5 && 
+        dayjs(u.expiryDate).isAfter(dayjs())
+      );
+
+      const expiringSoonSection = document.getElementById("expiringSoonSection");
+      const expiringSoonList = document.getElementById("expiringSoonList");
+
+      if (expiringSoon.length > 0) {
+        expiringSoonSection.classList.remove("hidden");
+        expiringSoonList.innerHTML = expiringSoon.map(user => `
+          <div class="flex justify-between items-center p-3 bg-white rounded-lg border">
+            <div>
+              <h5 class="font-semibold">${user.name}</h5>
+              <p class="text-sm text-gray-600">${user.phone}</p>
+              <p class="text-sm text-yellow-600">
+                Expires: ${dayjs(user.expiryDate).format('MMM DD, YYYY')} 
+                (${dayjs(user.expiryDate).diff(dayjs(), 'days')} days)
+              </p>
+            </div>
+            <button onclick="renewUserQuick('${user._id}')" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
+              Renew
+            </button>
+          </div>
+        `).join('');
+      } else {
+        expiringSoonSection.classList.add("hidden");
+      }
+
+      // Render dormant users
+      const thirtyDaysAgo = dayjs().subtract(30, 'days');
+      const dormantUsers = users.filter(user => 
+        !user.isDeleted &&
+        (!user.lastRenewalDate || dayjs(user.lastRenewalDate).isBefore(thirtyDaysAgo)) &&
+        dayjs(user.expiryDate).isBefore(dayjs())
+      );
+
+      const dormantUsersSection = document.getElementById("dormantUsersSection");
+      const dormantUsersList = document.getElementById("dormantUsersList");
+
+      if (dormantUsers.length > 0) {
+        dormantUsersSection.classList.remove("hidden");
+        dormantUsersList.innerHTML = dormantUsers.map(user => `
+          <div class="flex justify-between items-center p-3 bg-white rounded-lg border">
+            <div>
+              <h5 class="font-semibold">${user.name}</h5>
+              <p class="text-sm text-gray-600">${user.phone} - ${user.location}</p>
+              <p class="text-sm text-red-600">
+                Expired: ${dayjs(user.expiryDate).format('MMM DD, YYYY')}
+              </p>
+              <p class="text-xs text-gray-500">
+                Last renewal: ${user.lastRenewalDate ? dayjs(user.lastRenewalDate).format('MMM DD, YYYY') : 'Never'}
+              </p>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="renewUserQuick('${user._id}')" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
+                Renew
+              </button>
+              <button onclick="softDeleteUser('${user._id}')" class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">
+                Deactivate
+              </button>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        dormantUsersSection.classList.add("hidden");
+      }
+
+      // Render renewals summary
+      const currentMonthRenewals = renewals.filter(r => 
+        r.month === dayjs().format('MMMM') && 
+        r.year === dayjs().year() && 
+        !r.isDeleted
+      );
+
+      const renewalsCount = currentMonthRenewals.length;
+      const renewalsRevenue = currentMonthRenewals.reduce((sum, r) => sum + r.amount, 0);
+      const renewalsAverage = renewalsCount > 0 ? Math.round(renewalsRevenue / renewalsCount) : 0;
+
+      document.getElementById("renewalsCount").textContent = renewalsCount;
+      document.getElementById("renewalsRevenue").textContent = `Ksh ${renewalsRevenue.toLocaleString()}`;
+      document.getElementById("renewalsAverage").textContent = renewalsAverage;
+
+      // Recent renewals
+      const recentRenewals = currentMonthRenewals
+        .sort((a, b) => dayjs(b.renewalDate).unix() - dayjs(a.renewalDate).unix())
+        .slice(0, 5);
+
+      document.getElementById("recentRenewalsList").innerHTML = recentRenewals.map(renewal => `
+        <div class="flex justify-between items-center py-2 px-3 bg-gray-50 rounded">
+          <div>
+            <span class="font-medium">${renewal.userName}</span>
+            <span class="text-sm text-gray-500 ml-2">
+              ${dayjs(renewal.renewalDate).format('MMM DD')}
+            </span>
+          </div>
+          <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">
+            Ksh ${renewal.amount.toLocaleString()}
+          </span>
+        </div>
+      `).join('') || '<p class="text-gray-500 text-sm">No renewals this month</p>';
+    }
+
+    function processQuickRenewal() {
+      const userId = document.getElementById("renewalUserSelect").value;
+      const amount = parseFloat(document.getElementById("renewalAmount").value);
+
+      if (!userId || !amount || amount <= 0) {
+        Swal.fire('Error', 'Please select a user and enter a valid amount', 'error');
+        return;
+      }
+
+      renewUserWithAmount(userId, amount);
+      
+      // Clear form
+      document.getElementById("renewalUserSelect").value = '';
+      document.getElementById("renewalAmount").value = '';
+    }
+
+    function renewUserQuick(userId) {
+      const user = users.find(u => u._id === userId);
+      if (!user) return;
+
+      Swal.fire({
+        title: `Renew ${user.name}`,
+        input: 'number',
+        inputLabel: 'Renewal Amount (Ksh)',
+        inputValue: user.subscriptionAmount,
+        showCancelButton: true,
+        confirmButtonText: 'Renew',
+        inputValidator: (value) => {
+          if (!value || parseFloat(value) <= 0) {
+            return 'Please enter a valid amount';
+          }
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          renewUserWithAmount(userId, parseFloat(result.value));
+        }
+      });
+    }
+
+    function renewUserWithAmount(userId, amount) {
+      const userIndex = users.findIndex(u => u._id === userId);
+      if (userIndex === -1) return;
+
+      const renewalDate = dayjs().format('YYYY-MM-DD');
+      const expiryDate = dayjs().add(30, 'days').format('YYYY-MM-DD');
+
+      // Update user
+      users[userIndex] = {
+        ...users[userIndex],
+        paymentDate: renewalDate,
+        expiryDate: expiryDate,
+        paidSubscription: true,
+        lastRenewalDate: renewalDate,
+        subscriptionAmount: amount
+      };
+
+      // Add renewal record
+      const renewal = {
+        _id: Date.now().toString(),
+        userId: userId,
+        userName: users[userIndex].name,
+        amount: amount,
+        renewalDate: renewalDate,
+        expiryDate: expiryDate,
+        month: dayjs().format('MMMM'),
+        year: dayjs().year(),
+        isDeleted: false
+      };
+
+      renewals.push(renewal);
+
+      // Refresh displays
+      renderDashboard();
+      renderManageUsers();
+      renderRenewals();
+
+      Swal.fire('Success', `${users[userIndex].name} renewed successfully`, 'success');
+    }
+
+    function softDeleteUser(userId) {
+      const user = users.find(u => u._id === userId);
+      if (!user) return;
+
+      Swal.fire({
+        title: `Deactivate ${user.name}?`,
+        text: 'This will remove them from active users and soft delete their renewals.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, deactivate'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Soft delete user
+          const userIndex = users.findIndex(u => u._id === userId);
+          users[userIndex].isDeleted = true;
+
+          // Soft delete related renewals
+          renewals.forEach(r => {
+            if (r.userId === userId) {
+              r.isDeleted = true;
+            }
+          });
+
+          renderDashboard();
+          renderManageUsers();
+          renderRenewals();
+
+          Swal.fire('Deactivated', 'User has been deactivated successfully', 'success');
+        }
+      });
+    }
+
+    function showDetailedView(type) {
+      const container = document.getElementById("detailedViewContainer");
+      const title = document.getElementById("detailedViewTitle");
+      const content = document.getElementById("detailedViewContent");
+      
+      container.classList.remove("hidden");
+      
+      switch(type) {
+        case 'users':
+          title.textContent = "All Users";
+          content.innerHTML = generateUserTable(users.filter(u => !u.isDeleted));
+          break;
+        case 'active':
+          const activeUsers = users.filter(u => dayjs(u.expiryDate).isAfter(dayjs()) && !u.isDeleted);
+          title.textContent = "Active Users";
+          content.innerHTML = generateUserTable(activeUsers);
+          break;
+        case 'expired':
+          const expiredUsers = users.filter(u => dayjs(u.expiryDate).isBefore(dayjs()) && !u.isDeleted);
+          title.textContent = "Expired Users";
+          content.innerHTML = generateUserTable(expiredUsers);
+          break;
+        case 'monthly-income':
+          const currentMonthRenewals = renewals.filter(r => 
+            r.month === dayjs().format('MMMM') && 
+            r.year === dayjs().year() && 
+            !r.isDeleted
+          );
+          title.textContent = `Monthly Income Breakdown (${dayjs().format('MMMM YYYY')})`;
+          content.innerHTML = generateRenewalTable(currentMonthRenewals);
+          break;
+        case 'router':
+          const routerUsers = users.filter(u => u.routerCost > 0 && !u.isDeleted);
+          title.textContent = "Router Revenue";
+          content.innerHTML = generateRouterTable(routerUsers);
+          break;
+        case 'bookings':
+          title.textContent = "All Bookings";
+          content.innerHTML = generateBookingTable(bookings);
+          break;
+      }
+    }
+
+    function generateRenewalTable(renewalList) {
+      if (renewalList.length === 0) {
+        return '<div class="text-center text-gray-500 py-8">No renewals found for this month</div>';
+      }
+
+      return `
+        <table class="min-w-full table-auto">
+          <thead class="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white">
+            <tr>
+              <th class="px-4 py-3 text-left">User Name</th>
+              <th class="px-4 py-3 text-left">Amount</th>
+              <th class="px-4 py-3 text-left">Renewal Date</th>
+              <th class="px-4 py-3 text-left">Expiry Date</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            ${renewalList.map((renewal, index) => `
+              <tr class="${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:bg-yellow-50 transition-colors">
+                <td class="px-4 py-3 font-medium">${renewal.userName}</td>
+                <td class="px-4 py-3 font-bold text-green-600">Ksh ${renewal.amount.toLocaleString()}</td>
+                <td class="px-4 py-3">${dayjs(renewal.renewalDate).format('MMM DD, YYYY')}</td>
+                <td class="px-4 py-3">${dayjs(renewal.expiryDate).format('MMM DD, YYYY')}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function generateUserTable(userList) {
+      if (userList.length === 0) {
+        return '<div class="text-center text-gray-500 py-8">No users found</div>';
+      }
+
+      return `
+        <table class="min-w-full table-auto">
+          <thead class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+            <tr>
+              <th class="px-4 py-3 text-left">Name</th>
+              <th class="px-4 py-3 text-left">Phone</th>
+              <th class="px-4 py-3 text-left">Location</th>
+              <th class="px-4 py-3 text-left">Subscription</th>
+              <th class="px-4 py-3 text-left">Status</th>
+              <th class="px-4 py-3 text-left">Expiry</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            ${userList.map((user, index) => `
+              <tr class="${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:bg-indigo-50 transition-colors">
+                <td class="px-4 py-3 font-medium">${user.name}</td>
+                <td class="px-4 py-3">${user.phone}</td>
+                <td class="px-4 py-3">${user.location}</td>
+                <td class="px-4 py-3">
+                  <span class="px-2 py-1 text-xs rounded-full ${user.paidSubscription ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                    Ksh ${user.subscriptionAmount} (${user.paidSubscription ? 'Paid' : 'Unpaid'})
+                  </span>
+                </td>
+                <td class="px-4 py-3">
+                  <span class="px-2 py-1 text-xs rounded-full ${dayjs(user.expiryDate).isAfter(dayjs()) ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                    ${dayjs(user.expiryDate).isAfter(dayjs()) ? 'Active' : 'Expired'}
+                  </span>
+                </td>
+                <td class="px-4 py-3">${dayjs(user.expiryDate).format('MMM DD, YYYY')}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function generateRouterTable(routerUsers) {
+      if (routerUsers.length === 0) {
+        return '<div class="text-center text-gray-500 py-8">No router sales found</div>';
+      }
+
+      return `
+        <table class="min-w-full table-auto">
+          <thead class="bg-gradient-to-r from-purple-500 to-pink-600 text-white">
+            <tr>
+              <th class="px-4 py-3 text-left">Name</th>
+              <th class="px-4 py-3 text-left">Phone</th>
+              <th class="px-4 py-3 text-left">Location</th>
+              <th class="px-4 py-3 text-left">Router Cost</th>
+              <th class="px-4 py-3 text-left">Purchase Date</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            ${routerUsers.map((user, index) => `
+              <tr class="${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:bg-purple-50 transition-colors">
+                <td class="px-4 py-3 font-medium">${user.name}</td>
+                <td class="px-4 py-3">${user.phone}</td>
+                <td class="px-4 py-3">${user.location}</td>
+                <td class="px-4 py-3 font-bold text-purple-600">Ksh ${parseFloat(user.routerCost).toLocaleString()}</td>
+                <td class="px-4 py-3">${dayjs(user.paymentDate).format('MMM DD, YYYY')}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function generateBookingTable(bookingList) {
+      if (bookingList.length === 0) {
+        return '<div class="text-center text-gray-500 py-8">No bookings found</div>';
+      }
+
+      return `
+        <div class="space-y-4">
+          ${bookingList.map((booking, index) => `
+            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-200">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <h4 class="text-lg font-semibold text-blue-800 mb-2">Customer Info</h4>
+                  <p><strong>Name:</strong> ${booking.fullName || booking.name || 'N/A'}</p>
+                  <p><strong>Phone:</strong> ${booking.phone || 'N/A'}</p>
+                  <p><strong>Email:</strong> ${booking.email || 'N/A'}</p>
+                  <p><strong>Location:</strong> ${booking.location || booking.address || 'N/A'}</p>
+                </div>
+                <div>
+                  <h4 class="text-lg font-semibold text-blue-800 mb-2">Service Details</h4>
+                  <p><strong>Service:</strong> ${booking.serviceType || booking.service || 'N/A'}</p>
+                  <p><strong>Package:</strong> ${booking.package || booking.packageType || 'N/A'}</p>
+                  <p><strong>Installation:</strong> ${booking.installationDate ? dayjs(booking.installationDate).format('MMM DD, YYYY') : 'N/A'}</p>
+                  <p><strong>Time:</strong> ${booking.preferredTime || 'N/A'}</p>
+                </div>
+                <div>
+                  <h4 class="text-lg font-semibold text-blue-800 mb-2">Status & Actions</h4>
+                  <div class="space-y-2">
+                    <select onchange="updateBookingStatus(${index}, this.value)" class="w-full p-2 border rounded">
+                      <option value="pending" ${booking.status === 'pending' ? 'selected' : ''}>Pending</option>
+                      <option value="confirmed" ${booking.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+                      <option value="in_progress" ${booking.status === 'in_progress' ? 'selected' : ''}>In Progress</option>
+                      <option value="completed" ${booking.status === 'completed' ? 'selected' : ''}>Completed</option>
+                      <option value="cancelled" ${booking.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+                    </select>
+                    <div class="flex space-x-2">
+                      <button onclick="contactCustomer('${booking.phone}', '${booking.fullName || booking.name}')" class="bg-green-500 text-white px-3 py-1 rounded text-sm">📞 Contact</button>
+                      <button onclick="deleteBooking('${booking._id || booking.id}', ${index})" class="bg-red-500 text-white px-3 py-1 rounded text-sm">🗑️ Delete</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              ${booking.message || booking.notes ? `
+                <div class="mt-4 bg-white p-3 rounded border-l-4 border-blue-500">
+                  <strong>Message:</strong> ${booking.message || booking.notes}
+                </div>
+              ` : ''}
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function hideDetailedView() {
+      document.getElementById("detailedViewContainer").classList.add("hidden");
+    }
+
+    function renderManageUsers() {
+      const container = document.getElementById("manageUserList");
+      const activeUsers = users.filter(u => !u.isDeleted);
+      
+      container.innerHTML = activeUsers.map((u, i) => {
+        const isActive = dayjs(u.expiryDate).isAfter(dayjs());
+        const statusColor = isActive ? 'text-green-600' : 'text-red-600';
+        const statusText = isActive ? 'Active' : 'Expired';
+        
+        return `
+          <div class="p-4 bg-white rounded-lg shadow-md flex justify-between items-center">
+            <div>
+              <p class="font-semibold">${u.name}</p>
+              <p class="text-sm text-gray-600">${u.phone} - ${u.location}</p>
+              <p class="text-xs text-gray-500">Payment: ${dayjs(u.paymentDate).format('MMM DD, YYYY')} | Expires: ${dayjs(u.expiryDate).format('MMM DD, YYYY')}</p>
+              <p class="text-xs ${u.paidSubscription ? 'text-green-600' : 'text-red-600'}">Subscription: ${u.paidSubscription ? 'Paid' : 'Unpaid'} - Ksh ${u.subscriptionAmount}</p>
+              <p class="text-xs font-medium ${statusColor}">Status: ${statusText}</p>
+            </div>
+            <div class="space-x-2">
+              <button onclick="editUser(${i})" class="bg-blue-500 text-white px-2 py-1 rounded text-sm">Edit</button>
+              <button onclick="renewUser(${i})" class="bg-green-500 text-white px-2 py-1 rounded text-sm">Renew</button>
+              <button onclick="deleteUser('${u._id}')" class="bg-red-500 text-white px-2 py-1 rounded text-sm">Delete</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderBookings() {
+      const container = document.getElementById("bookingList");
+      if (bookings.length === 0) {
+        container.innerHTML = '<div class="text-center text-gray-500 py-8">No bookings found</div>';
+        return;
+      }
+      
+      container.innerHTML = bookings.map((booking, i) => `
+        <div class="p-6 bg-white rounded-lg shadow-md border border-gray-200">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <h4 class="text-lg font-semibold text-indigo-700 mb-2">Customer Information</h4>
+              <p class="mb-1"><strong>Name:</strong> ${booking.fullName || booking.name || 'N/A'}</p>
+              <p class="mb-1"><strong>Phone:</strong> ${booking.phone || 'N/A'}</p>
+              <p class="mb-1"><strong>Email:</strong> ${booking.email || 'N/A'}</p>
+              <p class="mb-1"><strong>Location:</strong> ${booking.location || booking.address || 'N/A'}</p>
+            </div>
+            <div>
+              <h4 class="text-lg font-semibold text-indigo-700 mb-2">Service Details</h4>
+              <p class="mb-1"><strong>Service Type:</strong> ${booking.serviceType || booking.service || 'N/A'}</p>
+              <p class="mb-1"><strong>Package:</strong> ${booking.package || booking.packageType || 'N/A'}</p>
+              <p class="mb-1"><strong>Installation Date:</strong> ${booking.installationDate ? dayjs(booking.installationDate).format('MMM DD, YYYY') : 'N/A'}</p>
+              <p class="mb-1"><strong>Preferred Time:</strong> ${booking.preferredTime || 'N/A'}</p>
+            </div>
+          </div>
+          
+          ${booking.message || booking.notes ? `
+            <div class="mt-4">
+              <h4 class="text-lg font-semibold text-indigo-700 mb-2">Additional Information</h4>
+              <p class="text-gray-700 bg-gray-50 p-3 rounded">${booking.message || booking.notes}</p>
+            </div>
+          ` : ''}
+          
+          <div class="mt-4 flex justify-between items-center">
+            <div class="text-sm text-gray-500">
+              <p><strong>Booking ID:</strong> ${booking._id || booking.id || 'N/A'}</p>
+              <p><strong>Created:</strong> ${booking.createdAt ? dayjs(booking.createdAt).format('MMM DD, YYYY HH:mm') : 'N/A'}</p>
+            </div>
+            <div class="space-x-2">
+              <button onclick="contactCustomer('${booking.phone}', '${booking.fullName || booking.name}')" 
+                      class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition">
+                📞 Contact
+              </button>
+              <select onchange="updateBookingStatusInline(${i}, this.value)" class="bg-blue-500 text-white px-3 py-1 rounded">
+                <option value="pending" ${booking.status === 'pending' ? 'selected' : ''}>Pending</option>
+                <option value="confirmed" ${booking.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+                <option value="in_progress" ${booking.status === 'in_progress' ? 'selected' : ''}>In Progress</option>
+                <option value="completed" ${booking.status === 'completed' ? 'selected' : ''}>Completed</option>
+                <option value="cancelled" ${booking.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+              </select>
+              <button onclick="deleteBooking('${booking._id || booking.id}', ${i})" 
+                      class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition">
+                🗑️ Delete
+              </button>
+            </div>
+          </div>
+          
+          ${booking.status ? `
+            <div class="mt-2">
+              <span class="inline-block px-2 py-1 text-xs rounded ${
+                booking.status === 'completed' ? 'bg-green-100 text-green-800' :
+                booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                booking.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                'bg-gray-100 text-gray-800'
+              }">
+                Status: ${booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+              </span>
+            </div>
+          ` : ''}
+        </div>
+      `).join('');
+    }
+
+    function editUser(index) {
+      const activeUsers = users.filter(u => !u.isDeleted);
+      const user = activeUsers[index];
+      const originalIndex = users.findIndex(u => u._id === user._id);
+      
+      Swal.fire({
+        title: 'Edit User',
+        html: `
+          <input id="editName" class="swal2-input" placeholder="Name" value="${user.name}">
+          <input id="editPhone" class="swal2-input" placeholder="Phone" value="${user.phone}">
+          <input id="editLocation" class="swal2-input" placeholder="Location" value="${user.location}">
+          <input id="editSubscription" class="swal2-input" type="number" placeholder="Subscription Amount" value="${user.subscriptionAmount}">
+          <div class="swal2-checkbox">
+            <input type="checkbox" id="editPaidSubscription" ${user.paidSubscription ? 'checked' : ''}>
+            <label for="editPaidSubscription">Paid Subscription</label>
+          </div>
+        `,
+        confirmButtonText: 'Save',
+        showCancelButton: true,
+        preConfirm: () => {
+          const updated = {
+            name: document.getElementById("editName").value,
+            phone: document.getElementById("editPhone").value,
+            location: document.getElementById("editLocation").value,
+            subscriptionAmount: parseFloat(document.getElementById("editSubscription").value),
+            paidSubscription: document.getElementById("editPaidSubscription").checked
+          };
+
+          users[originalIndex] = { ...users[originalIndex], ...updated };
+          renderManageUsers();
+          renderDashboard();
+          Swal.fire('Updated!', 'User information updated successfully', 'success');
+        }
+      });
+    }
+
+    function deleteUser(id) {
+      Swal.fire({
+        title: 'Delete User?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!'
+      }).then(result => {
+        if (result.isConfirmed) {
+          users = users.filter(u => u._id !== id);
+          renewals = renewals.filter(r => r.userId !== id);
+          renderManageUsers();
+          renderDashboard();
+          renderRenewals();
+          Swal.fire('Deleted!', 'User deleted successfully', 'success');
+        }
+      });
+    }
+
+    function navigateTo(id) {
+      document.querySelectorAll('main > section').forEach(section => section.classList.add('hidden'));
+      document.getElementById(id).classList.remove('hidden');
+      
+      if (id === 'website-bookings') {
+        renderBookings();
+      } else if (id === 'renewals') {
+        renderRenewals();
+      }
+    }
+
+function logout() {
+  Swal.fire('Logged Out', 'You have successfully logged out.', 'info').then(() => {
+    // Redirect to the login page
+    window.location.href = 'admin-login.html';
+  });
+}
+
+    function submitUserForm(e) {
+      e.preventDefault();
+      const form = e.target;
+      const data = Object.fromEntries(new FormData(form));
+      data.subscriptionAmount = parseFloat(data.subscriptionAmount);
+      data.routerCost = parseFloat(data.routerCost);
+      data.paidSubscription = data.paidSubscription === 'on';
+      data.expiryDate = dayjs(data.paymentDate).add(30, 'days').format('YYYY-MM-DD');
+      data._id = Date.now().toString();
+      data.isDeleted = false;
+
+      users.push(data);
+
+      // If subscription is paid, add to renewals
+      if (data.paidSubscription) {
+        const renewal = {
+          _id: Date.now().toString() + '_renewal',
+          userId: data._id,
+          userName: data.name,
+          amount: data.subscriptionAmount,
+          renewalDate: data.paymentDate,
+          expiryDate: data.expiryDate,
+          month: dayjs(data.paymentDate).format('MMMM'),
+          year: dayjs(data.paymentDate).year(),
+          isDeleted: false
+        };
+        renewals.push(renewal);
+      }
+
+      form.reset();
+      renderDashboard();
+      renderManageUsers();
+      renderRenewals();
+      Swal.fire('Success', '✅ User registered successfully', 'success');
+    }
+
+    async function renewUser(index) {
+      const activeUsers = users.filter(u => !u.isDeleted);
+      const user = activeUsers[index];
+      const originalIndex = users.findIndex(u => u._id === user._id);
+      
+      const { value: renewalData } = await Swal.fire({
+        title: `Renew ${user.name}`,
+        html: `
+          <input id="renewAmount" type="number" placeholder="New Subscription Amount" class="swal2-input" required value="${user.subscriptionAmount}">
+          <input id="renewDate" type="date" class="swal2-input" required value="${dayjs().format('YYYY-MM-DD')}">
+          <div class="swal2-checkbox">
+            <input type="checkbox" id="renewPaidSubscription" checked>
+            <label for="renewPaidSubscription">Mark as Paid</label>
+          </div>
+        `,
+        confirmButtonText: 'Renew Now',
+        showCancelButton: true,
+        preConfirm: () => {
+          const subscriptionAmount = parseFloat(document.getElementById("renewAmount").value);
+          const paymentDate = document.getElementById("renewDate").value;
+          const paidSubscription = document.getElementById("renewPaidSubscription").checked;
+          const expiryDate = dayjs(paymentDate).add(30, 'days').format('YYYY-MM-DD');
+
+          return {
+            subscriptionAmount,
+            paymentDate,
+            expiryDate,
+            paidSubscription
+          };
+        }
+      });
+
+      if (renewalData) {
+        users[originalIndex] = { ...users[originalIndex], ...renewalData, lastRenewalDate: renewalData.paymentDate };
+
+        // Add renewal record
+        if (renewalData.paidSubscription) {
+          const renewal = {
+            _id: Date.now().toString(),
+            userId: user._id,
+            userName: user.name,
+            amount: renewalData.subscriptionAmount,
+            renewalDate: renewalData.paymentDate,
+            expiryDate: renewalData.expiryDate,
+            month: dayjs(renewalData.paymentDate).format('MMMM'),
+            year: dayjs(renewalData.paymentDate).year(),
+            isDeleted: false
+          };
+          renewals.push(renewal);
+        }
+
+        renderDashboard();
+        renderManageUsers();
+        renderRenewals();
+        Swal.fire('✅ Renewed!', 'User subscription renewed successfully', 'success');
+      }
+    }
+
+    async function refreshBookings() {
+      try {
+        const response = await fetch(`${BASE_URL}/api/bookings`);
+        bookings = await response.json();
+        renderBookings();
+        renderDashboard();
+        Swal.fire({
+          title: 'Refreshed!',
+          text: 'Bookings data has been updated',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false
+        });
+      } catch (error) {
+        console.error('Error refreshing bookings:', error);
+        Swal.fire('Error', 'Failed to refresh bookings', 'error');
+      }
+    }
+
+    function contactCustomer(phone, name) {
+      Swal.fire({
+        title: `Contact ${name}`,
+        html: `
+          <p class="mb-4">Phone: <strong>${phone}</strong></p>
+          <div class="space-y-2">
+            <button onclick="window.open('tel:${phone}')" class="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+              📞 Call Customer
+            </button>
+            <button onclick="window.open('sms:${phone}')" class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+              💬 Send SMS
+            </button>
+            <button onclick="window.open('https://wa.me/${phone.replace(/[^0-9]/g, '')}')" class="w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+              📱 WhatsApp
+            </button>
+          </div>
+        `,
+        showConfirmButton: false,
+        showCloseButton: true
+      });
+    }
+
+    function updateBookingStatus(index, status) {
+      bookings[index].status = status;
+      renderBookings();
+      showDetailedView('bookings');
+      Swal.fire('Updated!', 'Booking status has been updated', 'success');
+    }
+
+    function updateBookingStatusInline(index, status) {
+      updateBookingStatus(index, status);
+    }
+
+    function deleteBooking(id, index) {
+      Swal.fire({
+        title: 'Delete Booking?',
+        text: 'This action cannot be undone!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!'
+      }).then(result => {
+        if (result.isConfirmed) {
+          bookings.splice(index, 1);
+          renderBookings();
+          renderDashboard();
+          Swal.fire('Deleted!', 'Booking has been deleted.', 'success');
+        }
+      });
+    }
+
+    let incomeChart;
+
+    function drawIncomeChart() {
+      const monthlyTotals = {};
+
+      renewals
+        .filter(r => !r.isDeleted)
+        .forEach(r => {
+          const monthYear = `${r.month} ${r.year}`;
+          monthlyTotals[monthYear] = (monthlyTotals[monthYear] || 0) + r.amount;
+        });
+
+      const labels = Object.keys(monthlyTotals);
+      const data = Object.values(monthlyTotals);
+
+      const ctx = document.getElementById('incomeChart').getContext('2d');
+
+      if (incomeChart) incomeChart.destroy();
+
+      incomeChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'KES Income',
+            data,
+            backgroundColor: 'rgba(79, 70, 229, 0.8)'
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+
+  </script>
+</body>
+</html>
