@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const path = require('path');
 const cors = require('cors');
 require('dotenv').config();
 
@@ -19,7 +20,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ✅ Static Folder (for frontend if needed)
-app.use(express.static('public'));
+// app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'frontend')));
+
+//Default first page
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', 'fine.html'));
+});
 
 console.log("✅ Middleware initialized");
 
