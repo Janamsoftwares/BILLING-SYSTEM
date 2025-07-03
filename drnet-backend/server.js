@@ -4,10 +4,10 @@ const path = require('path');
 const cors = require('cors');
 require('dotenv').config();
 
-const bookingRoutes = require('./routes/bookingRoutes');
-const contactRoutes = require('./routes/contactRoutes');
-const adminRoutes = require('./routes/adminRoutes');
-const userRoutes = require('./routes/userRoutes');
+const bookingRoutes = require('./Routes/bookingRoutes');
+const contactRoutes = require('./Routes/contactRoutes');
+const adminRoutes = require('./Routes/adminRoutes');
+const userRoutes = require('./Routes/userRoutes');
 
 const app = express(); // ✅ Declare app
 
