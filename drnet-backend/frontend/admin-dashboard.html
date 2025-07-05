@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en" class="bg-gray-100">
 <head>
@@ -9,87 +10,274 @@
   <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    /* Custom animations and enhanced styling */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: .8;
+      }
+    }
+    
+    .fade-in-up {
+      animation: fadeInUp 0.6s ease-out;
+    }
+    
+    .pulse-animation {
+      animation: pulse 2s infinite;
+    }
+    
+    .glass-effect {
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .hover-lift {
+      transition: all 0.3s ease;
+    }
+    
+    .hover-lift:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+    
+    .gradient-text {
+      background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      border-radius: 10px;
+    }
+    
+    /* Enhanced button styles */
+    .btn-primary {
+      background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+    }
+    
+    .card-enhanced {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.8) 100%);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Enhanced sidebar */
+    .sidebar-gradient {
+      background: linear-gradient(180deg, #1e3a8a 0%, #7c3aed 50%, #374151 100%);
+    }
+    
+    /* Loading animation */
+    .loading-spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
 </head>
-<body onload="initDashboard()" class="flex min-h-screen bg-gradient-to-br from-gray-100 via-purple-50 to-indigo-100">
+<body onload="initDashboard()" class="flex min-h-screen bg-gradient-to-br from-purple-100 via-blue-50 to-indigo-100">
   <!-- Sidebar -->
-  <aside class="w-72 h-screen bg-gradient-to-b from-indigo-900 via-purple-800 to-gray-900 shadow-2xl flex flex-col text-white">
-    <div class="p-6 border-b border-gray-700">
-      <h2 class="text-2xl font-extrabold tracking-wide">Dr.Net Admin</h2>
-      <p class="text-sm text-gray-300 mt-1">Julius - CTO</p>
+  <aside class="w-72 h-screen sidebar-gradient shadow-2xl flex flex-col text-white relative overflow-hidden">
+    <!-- Decorative background elements -->
+    <div class="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -translate-y-16 translate-x-16"></div>
+    <div class="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-5 rounded-full translate-y-12 -translate-x-12"></div>
+    
+    <div class="p-6 border-b border-white/20 glass-effect">
+      <h2 class="text-3xl font-extrabold tracking-wide mb-2">Dr.Net Admin</h2>
+      <p class="text-sm text-gray-200 mt-1 flex items-center">
+        <span class="w-2 h-2 bg-green-400 rounded-full mr-2 pulse-animation"></span>
+        Julius - CTO
+      </p>
     </div>
-    <nav class="p-4 space-y-4 flex-1">
-      <button onclick="navigateTo('dashboard')" class="w-full text-left py-3 px-4 rounded-lg bg-white/20 shadow-lg">
-        📊 <span class="ml-3 font-medium">Dashboard</span>
+    
+    <nav class="p-4 space-y-3 flex-1">
+      <button onclick="navigateTo('dashboard')" class="w-full text-left py-4 px-6 rounded-xl bg-white/20 shadow-lg hover-lift backdrop-blur-sm border border-white/10">
+        <span class="text-2xl mr-4">📊</span>
+        <span class="font-medium text-lg">Dashboard</span>
       </button>
-      <button onclick="navigateTo('register-user')" class="w-full text-left py-3 px-4 rounded-lg hover:bg-white/20">
-        ➕ <span class="ml-3 font-medium">Register User</span>
+      <button onclick="navigateTo('register-user')" class="w-full text-left py-4 px-6 rounded-xl hover:bg-white/20 hover-lift backdrop-blur-sm transition-all duration-300">
+        <span class="text-2xl mr-4">➕</span>
+        <span class="font-medium text-lg">Register User</span>
       </button>
-      <button onclick="navigateTo('manage-users')" class="w-full text-left py-3 px-4 rounded-lg hover:bg-white/20">
-        👥 <span class="ml-3 font-medium">Manage Users</span>
+      <button onclick="navigateTo('manage-users')" class="w-full text-left py-4 px-6 rounded-xl hover:bg-white/20 hover-lift backdrop-blur-sm transition-all duration-300">
+        <span class="text-2xl mr-4">👥</span>
+        <span class="font-medium text-lg">Manage Users</span>
       </button>
-      <button onclick="navigateTo('renewals')" class="w-full text-left py-3 px-4 rounded-lg hover:bg-white/20">
-        🔄 <span class="ml-3 font-medium">Renewals</span>
+      <button onclick="navigateTo('renewals')" class="w-full text-left py-4 px-6 rounded-xl hover:bg-white/20 hover-lift backdrop-blur-sm transition-all duration-300">
+        <span class="text-2xl mr-4">🔄</span>
+        <span class="font-medium text-lg">Renewals</span>
       </button>
-      <button onclick="navigateTo('website-bookings')" class="w-full text-left py-3 px-4 rounded-lg hover:bg-white/20">
-        🌐 <span class="ml-3 font-medium">Website Bookings</span>
+      <button onclick="navigateTo('invoice-generator')" class="w-full text-left py-4 px-6 rounded-xl hover:bg-white/20 hover-lift backdrop-blur-sm transition-all duration-300">
+        <span class="text-2xl mr-4">🧾</span>
+        <span class="font-medium text-lg">Invoice Generator</span>
+      </button>
+      <button onclick="navigateTo('website-bookings')" class="w-full text-left py-4 px-6 rounded-xl hover:bg-white/20 hover-lift backdrop-blur-sm transition-all duration-300">
+        <span class="text-2xl mr-4">🌐</span>
+        <span class="font-medium text-lg">Website Bookings</span>
       </button>
     </nav>
-    <div class="p-4 border-t border-gray-700">
-      <button onclick="logout()" class="w-full bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">
-        🚪 Log Out
+    
+    <div class="p-4 border-t border-white/20">
+      <button onclick="logout()" class="w-full bg-gradient-to-r from-red-500 to-pink-600 text-white px-6 py-3 rounded-xl hover:from-red-600 hover:to-pink-700 transition-all duration-300 font-semibold shadow-lg">
+        <span class="mr-2">🚪</span> Log Out
       </button>
     </div>
   </aside>
 
   <!-- Main Content -->
-  <main class="flex-1 p-6 overflow-y-auto">
-    <div id="notificationBox" class="hidden mb-6 bg-yellow-100 text-yellow-800 p-4 rounded-lg shadow-md">
-      ⚠️ Some users are expiring soon. <a href="#" onclick="showDetailedView('expired')" class="underline">View Now</a>
+  <main class="flex-1 p-8 overflow-y-auto">
+    <!-- Enhanced notification box -->
+    <div id="notificationBox" class="hidden mb-8 card-enhanced border-l-4 border-yellow-400 p-6 rounded-xl shadow-lg fade-in-up">
+      <div class="flex items-center">
+        <span class="text-3xl mr-4">⚠️</span>
+        <div>
+          <p class="font-semibold text-yellow-800">Attention Required</p>
+          <p class="text-yellow-700">Some users are expiring soon. <a href="#" onclick="showDetailedView('expired')" class="underline hover:text-yellow-900 font-medium">View Now</a></p>
+        </div>
+      </div>
     </div>
 
     <!-- Dashboard Section -->
     <section id="dashboard">
-      <h2 class="text-3xl font-bold text-indigo-800 mb-6">Julius@shadoWalker</h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div onclick="showDetailedView('users')" class="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white p-5 rounded-xl shadow-lg hover:scale-105 cursor-pointer transition-transform">
-          <p class="text-indigo-100">Total Users</p>
-          <p class="text-3xl font-bold" id="totalUsers">0</p>
+      <div class="mb-8 fade-in-up">
+        <h1 class="text-5xl font-bold gradient-text mb-2">Julius@shadoWalker</h1>
+        <p class="text-xl text-gray-600">Network Management Dashboard</p>
+      </div>
+      
+      <!-- Enhanced stats grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-10">
+        <div onclick="showDetailedView('users')" class="card-enhanced p-8 rounded-2xl hover-lift cursor-pointer transition-all duration-300 border-l-4 border-indigo-500">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-indigo-600 font-semibold text-lg mb-2">Total Users</p>
+              <p class="text-4xl font-bold text-gray-800" id="totalUsers">0</p>
+              <p class="text-sm text-gray-500 mt-1">Registered clients</p>
+            </div>
+            <div class="text-5xl opacity-80">👥</div>
+          </div>
         </div>
-        <div onclick="showDetailedView('active')" class="bg-gradient-to-r from-green-500 to-green-600 text-white p-5 rounded-xl shadow-lg hover:scale-105 cursor-pointer transition-transform">
-          <p class="text-green-100">Active Users</p>
-          <p class="text-3xl font-bold" id="activeUsers">0</p>
+        
+        <div onclick="showDetailedView('active')" class="card-enhanced p-8 rounded-2xl hover-lift cursor-pointer transition-all duration-300 border-l-4 border-green-500">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-green-600 font-semibold text-lg mb-2">Active Users</p>
+              <p class="text-4xl font-bold text-gray-800" id="activeUsers">0</p>
+              <p class="text-sm text-gray-500 mt-1">Currently subscribed</p>
+            </div>
+            <div class="text-5xl opacity-80">✅</div>
+          </div>
         </div>
-        <div onclick="showDetailedView('expired')" class="bg-gradient-to-r from-red-500 to-red-600 text-white p-5 rounded-xl shadow-lg hover:scale-105 cursor-pointer transition-transform">
-          <p class="text-red-100">Expired Users</p>
-          <p class="text-3xl font-bold" id="expiredUsers">0</p>
+        
+        <div onclick="showDetailedView('expired')" class="card-enhanced p-8 rounded-2xl hover-lift cursor-pointer transition-all duration-300 border-l-4 border-red-500">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-red-600 font-semibold text-lg mb-2">Expired Users</p>
+              <p class="text-4xl font-bold text-gray-800" id="expiredUsers">0</p>
+              <p class="text-sm text-gray-500 mt-1">Need renewal</p>
+            </div>
+            <div class="text-5xl opacity-80">⚠️</div>
+          </div>
         </div>
-        <div onclick="showDetailedView('monthly-income')" class="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white p-5 rounded-xl shadow-lg hover:scale-105 cursor-pointer transition-transform">
-          <p class="text-yellow-100">Monthly Income (<span id="currentMonthName"></span>)</p>
-          <p class="text-3xl font-bold" id="monthlyIncome">Ksh 0</p>
-          <p class="text-xs text-yellow-100 mt-1" id="monthlyIncomeDetails"></p>
+        
+        <div onclick="showDetailedView('monthly-income')" class="card-enhanced p-8 rounded-2xl hover-lift cursor-pointer transition-all duration-300 border-l-4 border-yellow-500">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-yellow-600 font-semibold text-lg mb-2">Monthly Income (<span id="currentMonthName"></span>)</p>
+              <p class="text-4xl font-bold text-gray-800" id="monthlyIncome">Ksh 0</p>
+              <p class="text-sm text-gray-500 mt-1" id="monthlyIncomeDetails">Revenue breakdown</p>
+            </div>
+            <div class="text-5xl opacity-80">💰</div>
+          </div>
         </div>
-        <div onclick="showDetailedView('router')" class="bg-gradient-to-r from-pink-500 to-pink-600 text-white p-5 rounded-xl shadow-lg hover:scale-105 cursor-pointer transition-transform">
-          <p class="text-pink-100">Router Revenue</p>
-          <p class="text-3xl font-bold" id="routerRevenue">Ksh 0</p>
+        
+        <div onclick="showDetailedView('router')" class="card-enhanced p-8 rounded-2xl hover-lift cursor-pointer transition-all duration-300 border-l-4 border-pink-500">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-pink-600 font-semibold text-lg mb-2">Router Revenue</p>
+              <p class="text-4xl font-bold text-gray-800" id="routerRevenue">Ksh 0</p>
+              <p class="text-sm text-gray-500 mt-1">Hardware sales</p>
+            </div>
+            <div class="text-5xl opacity-80">📡</div>
+          </div>
         </div>
-        <div onclick="showDetailedView('bookings')" class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-5 rounded-xl shadow-lg hover:scale-105 cursor-pointer transition-transform">
-          <p class="text-blue-100">Bookings</p>
-          <p class="text-3xl font-bold" id="totalBookings">0</p>
+        
+        <div onclick="showDetailedView('bookings')" class="card-enhanced p-8 rounded-2xl hover-lift cursor-pointer transition-all duration-300 border-l-4 border-blue-500">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-blue-600 font-semibold text-lg mb-2">Bookings</p>
+              <p class="text-4xl font-bold text-gray-800" id="totalBookings">0</p>
+              <p class="text-sm text-gray-500 mt-1">Website inquiries</p>
+            </div>
+            <div class="text-5xl opacity-80">🌐</div>
+          </div>
         </div>
       </div>
 
-      <!-- Income Chart -->
-      <div class="mt-8 bg-white rounded-xl shadow-lg p-6">
-        <h3 class="text-xl font-bold text-indigo-800 mb-4">Income Trend (Monthly)</h3>
+      <!-- Enhanced Income Chart -->
+      <div class="mb-10 card-enhanced rounded-2xl shadow-lg p-8 hover-lift">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-2xl font-bold gradient-text">Income Trend (Monthly)</h3>
+          <div class="flex space-x-2">
+            <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">📈 Growing</span>
+          </div>
+        </div>
         <canvas id="incomeChart" height="120"></canvas>
       </div>
 
       <!-- Detailed View Container -->
-      <div id="detailedViewContainer" class="mt-8 hidden">
-        <div class="bg-white rounded-xl shadow-lg p-6">
-          <div class="flex justify-between items-center mb-4">
-            <h3 id="detailedViewTitle" class="text-2xl font-bold text-indigo-800"></h3>
-            <button onclick="hideDetailedView()" class="text-gray-500 hover:text-gray-700 text-xl font-bold">&times;</button>
+      <div id="detailedViewContainer" class="mt-10 hidden fade-in-up">
+        <div class="card-enhanced rounded-2xl shadow-lg p-8">
+          <div class="flex justify-between items-center mb-6">
+            <h3 id="detailedViewTitle" class="text-3xl font-bold gradient-text"></h3>
+            <button onclick="hideDetailedView()" class="text-gray-400 hover:text-gray-600 text-3xl font-bold transition-colors duration-200">&times;</button>
           </div>
           <div id="detailedViewContent" class="overflow-x-auto"></div>
         </div>
@@ -97,24 +285,44 @@
     </section>
 
     <!-- Register User Section -->
-    <section id="register-user" class="hidden mt-6">
-      <h3 class="text-2xl font-bold text-indigo-700 mb-4">Register New User</h3>
-      <form id="registerForm" class="space-y-4 bg-white p-6 rounded-xl shadow-lg" onsubmit="submitUserForm(event)">
-        <input name="name" placeholder="Full Name" class="w-full p-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200" required />
-        <input name="location" placeholder="Location" class="w-full p-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200" required />
-        <input name="phone" placeholder="Phone Number" class="w-full p-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200" required />
-        <input name="subscriptionAmount" type="number" placeholder="Subscription Amount" class="w-full p-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200" required />
-        <input name="routerCost" type="number" placeholder="Router Cost (0 if none)" class="w-full p-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200" required />
-        <input name="paymentDate" type="date" class="w-full p-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200" required />
-
-        <div class="flex items-center space-x-2">
-          <input type="checkbox" id="paidSubscription" name="paidSubscription" class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
-          <label for="paidSubscription" class="text-gray-700">Has the user paid the subscription?</label>
+    <section id="register-user" class="hidden mt-8 fade-in-up">
+      <h3 class="text-3xl font-bold gradient-text mb-6">Register New User</h3>
+      <form id="registerForm" class="card-enhanced p-8 rounded-2xl shadow-lg space-y-6" onsubmit="submitUserForm(event)">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
+            <input name="name" placeholder="Enter full name" class="w-full p-4 rounded-xl border-2 border-gray-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200" required />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Location</label>
+            <input name="location" placeholder="Enter location" class="w-full p-4 rounded-xl border-2 border-gray-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200" required />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Phone Number</label>
+            <input name="phone" placeholder="+254 xxx xxx xxx" class="w-full p-4 rounded-xl border-2 border-gray-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200" required />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Subscription Amount</label>
+            <input name="subscriptionAmount" type="number" placeholder="Enter amount" class="w-full p-4 rounded-xl border-2 border-gray-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200" required />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Router Cost</label>
+            <input name="routerCost" type="number" placeholder="0 if none" class="w-full p-4 rounded-xl border-2 border-gray-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200" required />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Payment Date</label>
+            <input name="paymentDate" type="date" class="w-full p-4 rounded-xl border-2 border-gray-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200" required />
+          </div>
         </div>
 
-        <div class="mb-4">
-          <label for="package" class="block font-semibold text-gray-800 mb-1 text-sm">Select Internet Package</label>
-          <select name="package" id="package" required class="w-full px-3 py-2 rounded-lg border border-pink-300 shadow focus:ring-4 focus:ring-pink-400 focus:outline-none text-sm">
+        <div class="flex items-center space-x-3 p-4 bg-gray-50 rounded-xl">
+          <input type="checkbox" id="paidSubscription" name="paidSubscription" class="w-5 h-5 text-indigo-600 border-2 border-gray-300 rounded focus:ring-indigo-500">
+          <label for="paidSubscription" class="text-gray-700 font-medium">Has the user paid the subscription?</label>
+        </div>
+
+        <div>
+          <label for="package" class="block text-sm font-semibold text-gray-700 mb-2">Select Internet Package</label>
+          <select name="package" id="package" required class="w-full p-4 rounded-xl border-2 border-gray-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200">
             <option value="" disabled selected>Choose a Package</option>
             <option>Bronze Plan - Up to 5 Mbps (Ksh 1,500/Month)</option>
             <option>Silver Plan - Up to 10 Mbps (Ksh 2,000/Month)</option>
@@ -125,1012 +333,1022 @@
           </select>
         </div>
 
-        <button type="submit" class="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg hover:bg-indigo-700 transition-colors font-medium">
-          Register User
+        <button type="submit" class="w-full btn-primary text-lg font-semibold py-4 rounded-xl">
+          <span class="mr-2">✨</span> Register User
         </button>
       </form>
     </section>
 
+    <!-- Invoice Generator Section -->
+    <section id="invoice-generator" class="hidden mt-8 fade-in-up">
+      <h3 class="text-3xl font-bold gradient-text mb-6">Invoice Generator</h3>
+      
+      <!-- User Selection and Invoice Generation -->
+      <div class="card-enhanced p-8 rounded-2xl shadow-lg mb-8">
+        <h4 class="text-xl font-semibold text-gray-800 mb-6">Generate Invoice</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Select User</label>
+            <select id="invoiceUserSelect" class="w-full p-4 rounded-xl border-2 border-gray-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100">
+              <option value="">Choose a user...</option>
+            </select>
+          </div>
+          <div class="flex items-end">
+            <button onclick="generateInvoice()" class="w-full btn-primary py-4 rounded-xl font-semibold">
+              <span class="mr-2">🧾</span> Generate Invoice PDF
+            </button>
+          </div>
+        </div>
+        
+        <!-- Invoice Preview -->
+        <div id="invoicePreview" class="mt-6 p-6 bg-gray-50 rounded-xl hidden">
+          <h5 class="font-semibold text-gray-800 mb-4">Invoice Preview</h5>
+          <div id="invoicePreviewContent"></div>
+        </div>
+      </div>
+
+      <!-- SMS Templates -->
+      <div class="card-enhanced p-8 rounded-2xl shadow-lg">
+        <h4 class="text-xl font-semibold text-gray-800 mb-6">SMS Templates</h4>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <button onclick="generateSMSTemplate('invoice')" class="p-6 bg-blue-50 rounded-xl border-2 border-blue-200 hover:border-blue-400 transition-all duration-200">
+            <div class="text-3xl mb-2">📧</div>
+            <div class="font-semibold text-blue-800">Invoice SMS</div>
+            <div class="text-sm text-blue-600">Send invoice notification</div>
+          </button>
+          <button onclick="generateSMSTemplate('reminder')" class="p-6 bg-yellow-50 rounded-xl border-2 border-yellow-200 hover:border-yellow-400 transition-all duration-200">
+            <div class="text-3xl mb-2">⏰</div>
+            <div class="font-semibold text-yellow-800">Reminder SMS</div>
+            <div class="text-sm text-yellow-600">Send payment reminder</div>
+          </button>
+          <button onclick="generateSMSTemplate('confirmation')" class="p-6 bg-green-50 rounded-xl border-2 border-green-200 hover:border-green-400 transition-all duration-200">
+            <div class="text-3xl mb-2">✅</div>
+            <div class="font-semibold text-green-800">Payment Confirmation</div>
+            <div class="text-sm text-green-600">Confirm payment received</div>
+          </button>
+        </div>
+        
+        <!-- SMS Preview -->
+        <div id="smsPreview" class="mt-6 p-6 bg-gray-50 rounded-xl hidden">
+          <h5 class="font-semibold text-gray-800 mb-4">SMS Preview</h5>
+          <div id="smsPreviewContent" class="bg-white p-4 rounded-lg border font-mono text-sm"></div>
+          <button onclick="copySMSToClipboard()" class="mt-4 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+            📋 Copy to Clipboard
+          </button>
+        </div>
+      </div>
+    </section>
+
     <!-- Manage Users Section -->
-    <section id="manage-users" class="hidden mt-6">
-      <h3 class="text-2xl font-bold text-indigo-700 mb-4">Manage Users</h3>
-      <button onclick="exportToCSV()" class="mb-4 bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600">
-        📥 Export Users to CSV
-      </button>
-      <div id="manageUserList" class="space-y-3"></div>
+    <section id="manage-users" class="hidden mt-8 fade-in-up">
+      <h3 class="text-3xl font-bold gradient-text mb-6">Manage Users</h3>
+      <div class="card-enhanced p-8 rounded-2xl shadow-lg">
+        <div class="flex justify-between items-center mb-6">
+          <h4 class="text-xl font-semibold text-gray-800">User Management</h4>
+          <button onclick="exportToCSV()" class="btn-primary">
+            <span class="mr-2">📥</span> Export Users to CSV
+          </button>
+        </div>
+        <div id="manageUserList" class="space-y-4"></div>
+      </div>
     </section>
 
     <!-- Renewals Section -->
-    <section id="renewals" class="hidden mt-6">
-      <h3 class="text-2xl font-bold text-indigo-700 mb-4">Renewal Management</h3>
+    <section id="renewals" class="hidden mt-8 fade-in-up">
+      <h3 class="text-3xl font-bold gradient-text mb-6">Renewal Management</h3>
       
       <!-- Quick Renewal Form -->
-      <div class="bg-white p-6 rounded-xl shadow-lg mb-6">
-        <h4 class="text-lg font-semibold text-indigo-700 mb-4">🔄 Quick User Renewal</h4>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="card-enhanced p-8 rounded-2xl shadow-lg mb-8">
+        <h4 class="text-xl font-semibold text-gray-800 mb-6">🔄 Quick User Renewal</h4>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Select User</label>
-            <select id="renewalUserSelect" class="w-full p-2 border rounded-md">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Select User</label>
+            <select id="renewalUserSelect" class="w-full p-4 rounded-xl border-2 border-gray-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100">
               <option value="">Choose a user...</option>
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Renewal Amount (Ksh)</label>
-            <input type="number" id="renewalAmount" placeholder="Enter amount" class="w-full p-2 border rounded-md">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Renewal Amount (Ksh)</label>
+            <input type="number" id="renewalAmount" placeholder="Enter amount" class="w-full p-4 rounded-xl border-2 border-gray-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100">
           </div>
           <div class="flex items-end">
-            <button onclick="processQuickRenewal()" class="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition">
+            <button onclick="processQuickRenewal()" class="w-full bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-4 rounded-xl hover:from-green-600 hover:to-green-700 transition font-semibold">
               🔄 Renew Now
             </button>
           </div>
         </div>
       </div>
 
-      <!-- Expiring Soon Users -->
-      <div id="expiringSoonSection" class="bg-yellow-50 border border-yellow-200 p-6 rounded-xl shadow-lg mb-6 hidden">
-        <h4 class="text-lg font-semibold text-yellow-700 mb-4">📅 Users Expiring Soon (Next 5 Days)</h4>
-        <div id="expiringSoonList" class="space-y-3"></div>
-      </div>
+      <!-- Rest of renewals sections... -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Expiring Soon Users -->
+        <div id="expiringSoonSection" class="card-enhanced border-l-4 border-yellow-400 p-8 rounded-2xl hidden">
+          <h4 class="text-lg font-semibold text-yellow-700 mb-6">📅 Users Expiring Soon (Next 5 Days)</h4>
+          <div id="expiringSoonList" class="space-y-4"></div>
+        </div>
 
-      <!-- Dormant Users -->
-      <div id="dormantUsersSection" class="bg-red-50 border border-red-200 p-6 rounded-xl shadow-lg mb-6 hidden">
-        <h4 class="text-lg font-semibold text-red-700 mb-4">👥 Dormant Users (Expired & No Recent Activity)</h4>
-        <div id="dormantUsersList" class="space-y-3"></div>
+        <!-- Dormant Users -->
+        <div id="dormantUsersSection" class="card-enhanced border-l-4 border-red-400 p-8 rounded-2xl hidden">
+          <h4 class="text-lg font-semibold text-red-700 mb-6">👥 Dormant Users</h4>
+          <div id="dormantUsersList" class="space-y-4"></div>
+        </div>
       </div>
 
       <!-- Current Month Renewals Summary -->
-      <div class="bg-white p-6 rounded-xl shadow-lg">
-        <h4 class="text-lg font-semibold text-indigo-700 mb-4">💰 <span id="currentMonthRenewals"></span> Renewals Summary</h4>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          <div class="text-center p-4 bg-green-50 rounded-lg">
-            <p class="text-2xl font-bold text-green-600" id="renewalsCount">0</p>
-            <p class="text-sm text-gray-600">Renewals This Month</p>
+      <div class="card-enhanced p-8 rounded-2xl shadow-lg mt-8">
+        <h4 class="text-xl font-semibold text-gray-800 mb-6">💰 <span id="currentMonthRenewals"></span> Renewals Summary</h4>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div class="text-center p-6 bg-gradient-to-r from-green-50 to-green-100 rounded-xl border border-green-200">
+            <p class="text-3xl font-bold text-green-600" id="renewalsCount">0</p>
+            <p class="text-sm text-gray-600 font-medium">Renewals This Month</p>
           </div>
-          <div class="text-center p-4 bg-blue-50 rounded-lg">
-            <p class="text-2xl font-bold text-blue-600" id="renewalsRevenue">Ksh 0</p>
-            <p class="text-sm text-gray-600">Total Revenue</p>
+          <div class="text-center p-6 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-200">
+            <p class="text-3xl font-bold text-blue-600" id="renewalsRevenue">Ksh 0</p>
+            <p class="text-sm text-gray-600 font-medium">Total Revenue</p>
           </div>
-          <div class="text-center p-4 bg-yellow-50 rounded-lg">
-            <p class="text-2xl font-bold text-yellow-600" id="renewalsAverage">0</p>
-            <p class="text-sm text-gray-600">Average Per Renewal</p>
+          <div class="text-center p-6 bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-xl border border-yellow-200">
+            <p class="text-3xl font-bold text-yellow-600" id="renewalsAverage">0</p>
+            <p class="text-sm text-gray-600 font-medium">Average Per Renewal</p>
           </div>
         </div>
         
-        <hr class="my-4">
+        <hr class="my-6 border-gray-200">
         
         <div>
-          <h5 class="font-semibold mb-2">Recent Renewals</h5>
-          <div id="recentRenewalsList" class="space-y-2"></div>
+          <h5 class="font-semibold text-gray-800 mb-4">Recent Renewals</h5>
+          <div id="recentRenewalsList" class="space-y-3"></div>
         </div>
       </div>
     </section>
 
     <!-- Website Bookings Section -->
-    <section id="website-bookings" class="hidden mt-6">
-      <h3 class="text-2xl font-bold text-indigo-700 mb-4">Website Bookings</h3>
-      <div class="mb-4">
-        <button onclick="refreshBookings()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
-          🔄 Refresh Bookings
-        </button>
+    <section id="website-bookings" class="hidden mt-8 fade-in-up">
+      <h3 class="text-3xl font-bold gradient-text mb-6">Website Bookings</h3>
+      <div class="card-enhanced p-8 rounded-2xl shadow-lg">
+        <div class="flex justify-between items-center mb-6">
+          <h4 class="text-xl font-semibold text-gray-800">Customer Inquiries</h4>
+          <button onclick="refreshBookings()" class="btn-primary">
+            <span class="mr-2">🔄</span> Refresh Bookings
+          </button>
+        </div>
+        <div id="bookingList" class="space-y-6"></div>
       </div>
-      <div id="bookingList" class="space-y-4"></div>
     </section>
   </main>
 
   <script>
-    const BASE_URL = 'http://localhost:5000';
-    let users = [], bookings = [], renewals = [];
+    // Global variables
+    let users = [];
+    let bookings = [];
+    let currentSection = 'dashboard';
+    let currentSMSContent = '';
 
-    async function initDashboard() {
-      await fetchData();
-      renderDashboard();
-      renderManageUsers();
-      renderRenewals();
-      renderBookings();
-    }
-
-    async function fetchData() {
-      try {
-        const [usersRes, bookingsRes] = await Promise.all([
-          fetch(`${BASE_URL}/api/users`),
-          fetch(`${BASE_URL}/api/bookings`)
-        ]);
-        users = await usersRes.json();
-        bookings = await bookingsRes.json();
-        
-        // Initialize renewals from users data if no separate renewals endpoint
-        renewals = users
-          .filter(u => u.paidSubscription && u.paymentDate)
-          .map(u => ({
-            _id: u._id + '_renewal',
-            userId: u._id,
-            userName: u.name,
-            amount: parseFloat(u.subscriptionAmount),
-            renewalDate: u.paymentDate,
-            expiryDate: u.expiryDate,
-            month: dayjs(u.paymentDate).format('MMMM'),
-            year: dayjs(u.paymentDate).year(),
-            isDeleted: false
-          }));
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        users = [];
-        bookings = [];
-        renewals = [];
-      }
-    }
-
-    function getCurrentMonthIncome() {
-      const currentMonth = dayjs().format('MMMM');
-      const currentYear = dayjs().year();
+    // Initialize dashboard
+    function initDashboard() {
+      loadSampleData();
+      updateDashboard();
+      setupChart();
+      populateUserSelects();
       
-      return renewals
-        .filter(renewal => 
-          renewal.month === currentMonth && 
-          renewal.year === currentYear && 
-          !renewal.isDeleted
-        )
-        .reduce((total, renewal) => total + renewal.amount, 0);
-    }
-
-    function checkExpiries() {
-      const soonExpiring = users.filter(u =>
-        u.expiryDate && dayjs(u.expiryDate).diff(dayjs(), 'day') <= 5 &&
-        dayjs(u.expiryDate).isAfter(dayjs())
-      );
-
-      const box = document.getElementById("notificationBox");
-      if (soonExpiring.length > 0) {
-        box.classList.remove("hidden");
-      } else {
-        box.classList.add("hidden");
-      }
-    }
-
-    function exportToCSV() {
-      const headers = ["Name", "Phone", "Location", "Subscription", "Paid", "Router Cost", "Payment Date", "Expiry Date"];
-      const rows = users.map(u => [
-        u.name, u.phone, u.location, u.subscriptionAmount, u.paidSubscription ? "Yes" : "No",
-        u.routerCost, u.paymentDate, u.expiryDate
-      ]);
-
-      let csv = headers.join(",") + "\n" + rows.map(r => r.join(",")).join("\n");
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "drnet_users.csv";
-      link.click();
-    }
-
-    function renderDashboard() {
-      checkExpiries();
-      drawIncomeChart();
-
+      // Set current month name
       const currentMonth = dayjs().format('MMMM');
-      const monthlyIncome = getCurrentMonthIncome();
-      const renewalCount = renewals.filter(r => 
-        r.month === currentMonth && 
-        r.year === dayjs().year() && 
-        !r.isDeleted
-      ).length;
-
-      // Calculate router revenue
-      const routerRevenue = users.reduce((sum, u) => sum + (parseFloat(u.routerCost) || 0), 0);
-
-      document.getElementById("totalUsers").textContent = users.filter(u => !u.isDeleted).length;
-      document.getElementById("activeUsers").textContent = users.filter(u => dayjs(u.expiryDate).isAfter(dayjs()) && !u.isDeleted).length;
-      document.getElementById("expiredUsers").textContent = users.filter(u => dayjs(u.expiryDate).isBefore(dayjs()) && !u.isDeleted).length;
-      document.getElementById("monthlyIncome").textContent = `Ksh ${monthlyIncome.toLocaleString()}`;
-      document.getElementById("currentMonthName").textContent = currentMonth;
-      document.getElementById("monthlyIncomeDetails").textContent = `${renewalCount} renewals this month`;
-      document.getElementById("routerRevenue").textContent = `Ksh ${routerRevenue.toLocaleString()}`;
-      document.getElementById("totalBookings").textContent = bookings.length;
+      document.getElementById('currentMonthName').textContent = currentMonth;
+      document.getElementById('currentMonthRenewals').textContent = currentMonth;
     }
 
-    function renderRenewals() {
-      const currentMonth = dayjs().format('MMMM YYYY');
-      document.getElementById("currentMonthRenewals").textContent = currentMonth;
+    // Load sample data
+    function loadSampleData() {
+      users = [
+        {
+          _id: '1',
+          name: 'John Doe',
+          phone: '+254700123456',
+          location: 'Nairobi',
+          subscriptionAmount: 2500,
+          routerCost: 5000,
+          expiryDate: '2025-07-15',
+          paidSubscription: true,
+          paymentDate: '2025-06-15',
+          package: 'Gold Plan - Up to 15 Mbps (Ksh 2,500/Month)'
+        },
+        {
+          _id: '2',
+          name: 'Jane Smith',
+          phone: '+254711234567',
+          location: 'Mombasa',
+          subscriptionAmount: 3000,
+          routerCost: 0,
+          expiryDate: '2025-07-30',
+          paidSubscription: true,
+          paymentDate: '2025-06-30',
+          package: 'Platinum Plan - Up to 20 Mbps (Ksh 3,000/Month)'
+        },
+        {
+          _id: '3',
+          name: 'Peter Kamau',
+          phone: '+254722345678',
+          location: 'Kisumu',
+          subscriptionAmount: 2000,
+          routerCost: 3500,
+          expiryDate: '2025-07-10',
+          paidSubscription: false,
+          paymentDate: '2025-06-10',
+          package: 'Silver Plan - Up to 10 Mbps (Ksh 2,000/Month)'
+        }
+      ];
 
-      // Populate renewal user select
-      const select = document.getElementById("renewalUserSelect");
-      select.innerHTML = '<option value="">Choose a user...</option>';
-      users.filter(u => !u.isDeleted).forEach(user => {
-        const option = document.createElement('option');
-        option.value = user._id;
-        option.textContent = `${user.name} - ${user.phone}`;
-        select.appendChild(option);
+      bookings = [
+        {
+          id: '1',
+          name: 'Alice Johnson',
+          email: 'alice@email.com',
+          phone: '+254733456789',
+          location: 'Karen',
+          package: 'Super Plan',
+          message: 'Interested in high-speed internet for home office',
+          date: '2025-07-01'
+        }
+      ];
+    }
+
+    // Navigation
+    function navigateTo(section) {
+      // Hide all sections
+      const sections = ['dashboard', 'register-user', 'manage-users', 'renewals', 'invoice-generator', 'website-bookings'];
+      sections.forEach(s => {
+        document.getElementById(s).classList.add('hidden');
       });
-
-      // Render expiring soon users
-      const expiringSoon = users.filter(u => 
-        !u.isDeleted &&
-        dayjs(u.expiryDate).diff(dayjs(), 'days') <= 5 && 
-        dayjs(u.expiryDate).isAfter(dayjs())
-      );
-
-      const expiringSoonSection = document.getElementById("expiringSoonSection");
-      const expiringSoonList = document.getElementById("expiringSoonList");
-
-      if (expiringSoon.length > 0) {
-        expiringSoonSection.classList.remove("hidden");
-        expiringSoonList.innerHTML = expiringSoon.map(user => `
-          <div class="flex justify-between items-center p-3 bg-white rounded-lg border">
-            <div>
-              <h5 class="font-semibold">${user.name}</h5>
-              <p class="text-sm text-gray-600">${user.phone}</p>
-              <p class="text-sm text-yellow-600">
-                Expires: ${dayjs(user.expiryDate).format('MMM DD, YYYY')} 
-                (${dayjs(user.expiryDate).diff(dayjs(), 'days')} days)
-              </p>
-            </div>
-            <button onclick="renewUserQuick('${user._id}')" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
-              Renew
-            </button>
-          </div>
-        `).join('');
-      } else {
-        expiringSoonSection.classList.add("hidden");
+      
+      // Show selected section
+      document.getElementById(section).classList.remove('hidden');
+      document.getElementById(section).classList.add('fade-in-up');
+      
+      currentSection = section;
+      
+      // Update active nav button
+      updateActiveNavButton(section);
+      
+      // Load section-specific data
+      if (section === 'manage-users') {
+        loadManageUsers();
+      } else if (section === 'renewals') {
+        loadRenewalsData();
+      } else if (section === 'website-bookings') {
+        loadBookings();
+      } else if (section === 'invoice-generator') {
+        populateInvoiceUserSelect();
       }
-
-      // Render dormant users
-      const thirtyDaysAgo = dayjs().subtract(30, 'days');
-      const dormantUsers = users.filter(user => 
-        !user.isDeleted &&
-        (!user.lastRenewalDate || dayjs(user.lastRenewalDate).isBefore(thirtyDaysAgo)) &&
-        dayjs(user.expiryDate).isBefore(dayjs())
-      );
-
-      const dormantUsersSection = document.getElementById("dormantUsersSection");
-      const dormantUsersList = document.getElementById("dormantUsersList");
-
-      if (dormantUsers.length > 0) {
-        dormantUsersSection.classList.remove("hidden");
-        dormantUsersList.innerHTML = dormantUsers.map(user => `
-          <div class="flex justify-between items-center p-3 bg-white rounded-lg border">
-            <div>
-              <h5 class="font-semibold">${user.name}</h5>
-              <p class="text-sm text-gray-600">${user.phone} - ${user.location}</p>
-              <p class="text-sm text-red-600">
-                Expired: ${dayjs(user.expiryDate).format('MMM DD, YYYY')}
-              </p>
-              <p class="text-xs text-gray-500">
-                Last renewal: ${user.lastRenewalDate ? dayjs(user.lastRenewalDate).format('MMM DD, YYYY') : 'Never'}
-              </p>
-            </div>
-            <div class="flex gap-2">
-              <button onclick="renewUserQuick('${user._id}')" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
-                Renew
-              </button>
-              <button onclick="softDeleteUser('${user._id}')" class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">
-                Deactivate
-              </button>
-            </div>
-          </div>
-        `).join('');
-      } else {
-        dormantUsersSection.classList.add("hidden");
-      }
-
-      // Render renewals summary
-      const currentMonthRenewals = renewals.filter(r => 
-        r.month === dayjs().format('MMMM') && 
-        r.year === dayjs().year() && 
-        !r.isDeleted
-      );
-
-      const renewalsCount = currentMonthRenewals.length;
-      const renewalsRevenue = currentMonthRenewals.reduce((sum, r) => sum + r.amount, 0);
-      const renewalsAverage = renewalsCount > 0 ? Math.round(renewalsRevenue / renewalsCount) : 0;
-
-      document.getElementById("renewalsCount").textContent = renewalsCount;
-      document.getElementById("renewalsRevenue").textContent = `Ksh ${renewalsRevenue.toLocaleString()}`;
-      document.getElementById("renewalsAverage").textContent = renewalsAverage;
-
-      // Recent renewals
-      const recentRenewals = currentMonthRenewals
-        .sort((a, b) => dayjs(b.renewalDate).unix() - dayjs(a.renewalDate).unix())
-        .slice(0, 5);
-
-      document.getElementById("recentRenewalsList").innerHTML = recentRenewals.map(renewal => `
-        <div class="flex justify-between items-center py-2 px-3 bg-gray-50 rounded">
-          <div>
-            <span class="font-medium">${renewal.userName}</span>
-            <span class="text-sm text-gray-500 ml-2">
-              ${dayjs(renewal.renewalDate).format('MMM DD')}
-            </span>
-          </div>
-          <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">
-            Ksh ${renewal.amount.toLocaleString()}
-          </span>
-        </div>
-      `).join('') || '<p class="text-gray-500 text-sm">No renewals this month</p>';
     }
 
-    function processQuickRenewal() {
-      const userId = document.getElementById("renewalUserSelect").value;
-      const amount = parseFloat(document.getElementById("renewalAmount").value);
+    function updateActiveNavButton(activeSection) {
+      // Remove active class from all nav buttons
+      const navButtons = document.querySelectorAll('nav button');
+      navButtons.forEach(btn => {
+        btn.classList.remove('bg-white/20');
+      });
+      
+      // Add active class to current button
+      const sectionMap = {
+        'dashboard': 0,
+        'register-user': 1,
+        'manage-users': 2,
+        'renewals': 3,
+        'invoice-generator': 4,
+        'website-bookings': 5
+      };
+      
+      if (navButtons[sectionMap[activeSection]]) {
+        navButtons[sectionMap[activeSection]].classList.add('bg-white/20');
+      }
+    }
 
-      if (!userId || !amount || amount <= 0) {
-        Swal.fire('Error', 'Please select a user and enter a valid amount', 'error');
+    // Update dashboard statistics
+    function updateDashboard() {
+      const now = new Date();
+      const activeUsers = users.filter(user => !user.isDeleted && new Date(user.expiryDate) > now);
+      const expiredUsers = users.filter(user => !user.isDeleted && new Date(user.expiryDate) <= now);
+      
+      document.getElementById('totalUsers').textContent = users.filter(u => !u.isDeleted).length;
+      document.getElementById('activeUsers').textContent = activeUsers.length;
+      document.getElementById('expiredUsers').textContent = expiredUsers.length;
+      
+      const monthlyIncome = users.reduce((sum, user) => sum + (user.paidSubscription ? user.subscriptionAmount : 0), 0);
+      const routerRevenue = users.reduce((sum, user) => sum + (user.routerCost || 0), 0);
+      
+      document.getElementById('monthlyIncome').textContent = `Ksh ${monthlyIncome.toLocaleString()}`;
+      document.getElementById('routerRevenue').textContent = `Ksh ${routerRevenue.toLocaleString()}`;
+      document.getElementById('totalBookings').textContent = bookings.length;
+      
+      document.getElementById('monthlyIncomeDetails').textContent = `${users.filter(u => u.paidSubscription).length} paid subscribers`;
+      
+      // Check for expiring users
+      const fiveDaysFromNow = new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000);
+      const soonExpiring = users.filter(user => 
+        !user.isDeleted && 
+        new Date(user.expiryDate) > now && 
+        new Date(user.expiryDate) <= fiveDaysFromNow
+      );
+      
+      if (soonExpiring.length > 0 || expiredUsers.length > 0) {
+        document.getElementById('notificationBox').classList.remove('hidden');
+      }
+    }
+
+    // Setup chart
+    function setupChart() {
+      const ctx = document.getElementById('incomeChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+          datasets: [{
+            label: 'Monthly Income (Ksh)',
+            data: [45000, 52000, 48000, 61000, 55000, 67000, 73000],
+            borderColor: 'rgb(102, 126, 234)',
+            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+            tension: 0.4,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return 'Ksh ' + value.toLocaleString();
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Populate user select dropdowns
+    function populateUserSelects() {
+      const renewalSelect = document.getElementById('renewalUserSelect');
+      const invoiceSelect = document.getElementById('invoiceUserSelect');
+      
+      [renewalSelect, invoiceSelect].forEach(select => {
+        if (select) {
+          select.innerHTML = '<option value="">Choose a user...</option>';
+          users.forEach(user => {
+            if (!user.isDeleted) {
+              const option = document.createElement('option');
+              option.value = user._id;
+              option.textContent = `${user.name} - ${user.location}`;
+              select.appendChild(option);
+            }
+          });
+        }
+      });
+    }
+
+    function populateInvoiceUserSelect() {
+      populateUserSelects();
+    }
+
+    // Invoice Generation
+    function generateInvoice() {
+      const userId = document.getElementById('invoiceUserSelect').value;
+      if (!userId) {
+        Swal.fire('Error', 'Please select a user first', 'error');
         return;
       }
 
-      renewUserWithAmount(userId, amount);
+      const user = users.find(u => u._id === userId);
+      if (!user) {
+        Swal.fire('Error', 'User not found', 'error');
+        return;
+      }
+
+      // Generate invoice data
+      const invoiceData = {
+        id: 'INV-' + Date.now(),
+        userId: user._id,
+        userName: user.name,
+        userPhone: user.phone,
+        userLocation: user.location,
+        amount: user.subscriptionAmount,
+        invoiceNumber: 'INV-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
+        issueDate: dayjs().format('YYYY-MM-DD'),
+        dueDate: dayjs().add(7, 'days').format('YYYY-MM-DD'),
+        status: 'pending'
+      };
+
+      // Generate PDF using jsPDF
+      generateInvoicePDF(invoiceData);
       
-      // Clear form
-      document.getElementById("renewalUserSelect").value = '';
-      document.getElementById("renewalAmount").value = '';
+      // Show preview
+      showInvoicePreview(invoiceData);
     }
 
-    function renewUserQuick(userId) {
-      const user = users.find(u => u._id === userId);
-      if (!user) return;
+    function generateInvoicePDF(invoice) {
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF();
+      
+      // Company branding
+      pdf.setFontSize(24);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(220, 38, 127);
+      pdf.text('DR.NET TECHNOLOGY LABS', 20, 30);
+      
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(100, 100, 100);
+      pdf.text('Internet Service Provider & Technology Solutions', 20, 38);
+      pdf.text('Phone: 0701782354 | Email: dr.netinnovations@gmail.com', 20, 45);
+      pdf.text('Website: www.drnet.co.ke', 20, 52);
+      
+      // Invoice header
+      pdf.setFontSize(20);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(0, 0, 0);
+      pdf.text('INVOICE', 150, 30);
+      
+      // Invoice details box
+      pdf.setDrawColor(220, 38, 127);
+      pdf.setLineWidth(0.5);
+      pdf.rect(120, 35, 70, 25);
+      
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(`Invoice #: ${invoice.invoiceNumber}`, 125, 42);
+      pdf.text(`Issue Date: ${formatDate(invoice.issueDate)}`, 125, 48);
+      pdf.text(`Due Date: ${formatDate(invoice.dueDate)}`, 125, 54);
+      
+      // Client information
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('BILL TO:', 20, 80);
+      
+      pdf.setFontSize(12);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(invoice.userName, 20, 90);
+      pdf.text(`Phone: ${invoice.userPhone}`, 20, 98);
+      pdf.text(`Location: ${invoice.userLocation}`, 20, 106);
+      
+      // Service details table
+      const startY = 130;
+      
+      // Table header
+      pdf.setFillColor(240, 240, 240);
+      pdf.rect(20, startY, 170, 10, 'F');
+      
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('DESCRIPTION', 25, startY + 7);
+      pdf.text('PERIOD', 100, startY + 7);
+      pdf.text('AMOUNT (KSH)', 140, startY + 7);
+      
+      // Table content
+      pdf.setFont('helvetica', 'normal');
+      const contentY = startY + 20;
+      pdf.text('Internet Subscription Service', 25, contentY);
+      pdf.text('Monthly Service', 100, contentY);
+      pdf.text(invoice.amount.toLocaleString(), 145, contentY);
+      
+      // Subtotal and total
+      const totalY = contentY + 30;
+      pdf.setDrawColor(0, 0, 0);
+      pdf.line(120, totalY - 5, 190, totalY - 5);
+      
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('SUBTOTAL:', 120, totalY);
+      pdf.text(`KSH ${invoice.amount.toLocaleString()}`, 160, totalY);
+      
+      pdf.text('TOTAL DUE:', 120, totalY + 10);
+      pdf.setFontSize(12);
+      pdf.setTextColor(220, 38, 127);
+      pdf.text(`KSH ${invoice.amount.toLocaleString()}`, 160, totalY + 10);
+      
+      // Payment instructions with M-PESA details
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(0, 0, 0);
+      pdf.text('PAYMENT INSTRUCTIONS:', 20, totalY + 30);
+      pdf.text('• M-PESA: Lipa na M-Pesa Buy Goods', 20, totalY + 38);
+      pdf.text('• Till Number: 5626320', 20, totalY + 45);
+      pdf.text('• Name: DR.NET TECHNOLOGY LABS', 20, totalY + 52);
+      pdf.text(`• Reference: ${invoice.invoiceNumber}`, 20, totalY + 59);
+      pdf.text('• Payment due within 7 days of invoice date', 20, totalY + 66);
+      pdf.text('• For assistance call: 0701782354', 20, totalY + 73);
+      
+      // Footer
+      pdf.setFontSize(8);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text('Thank you for choosing DR.NET TECHNOLOGY LABS for your internet needs!', 20, 270);
+      pdf.text('For support or inquiries, contact us at dr.netinnovations@gmail.com or 0701782354', 20, 277);
+      
+      // Save the PDF
+      pdf.save(`DR-NET-Invoice-${invoice.invoiceNumber}.pdf`);
+      
+      Swal.fire('Success', 'Invoice PDF generated successfully!', 'success');
+    }
 
-      Swal.fire({
-        title: `Renew ${user.name}`,
-        input: 'number',
-        inputLabel: 'Renewal Amount (Ksh)',
-        inputValue: user.subscriptionAmount,
-        showCancelButton: true,
-        confirmButtonText: 'Renew',
-        inputValidator: (value) => {
-          if (!value || parseFloat(value) <= 0) {
-            return 'Please enter a valid amount';
-          }
-        }
-      }).then((result) => {
-        if (result.isConfirmed) {
-          renewUserWithAmount(userId, parseFloat(result.value));
-        }
+    function showInvoicePreview(invoice) {
+      const preview = document.getElementById('invoicePreview');
+      const content = document.getElementById('invoicePreviewContent');
+      
+      content.innerHTML = `
+        <div class="border rounded-lg p-4 bg-white">
+          <div class="flex justify-between mb-4">
+            <div>
+              <h6 class="font-bold text-lg text-pink-600">DR.NET TECHNOLOGY LABS</h6>
+              <p class="text-sm text-gray-600">Internet Service Provider</p>
+            </div>
+            <div class="text-right">
+              <h6 class="font-bold">INVOICE</h6>
+              <p class="text-sm">#${invoice.invoiceNumber}</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <p class="font-semibold">Bill To:</p>
+              <p>${invoice.userName}</p>
+              <p>${invoice.userPhone}</p>
+              <p>${invoice.userLocation}</p>
+            </div>
+            <div class="text-right">
+              <p><strong>Issue Date:</strong> ${formatDate(invoice.issueDate)}</p>
+              <p><strong>Due Date:</strong> ${formatDate(invoice.dueDate)}</p>
+              <p><strong>Amount:</strong> KSH ${invoice.amount.toLocaleString()}</p>
+            </div>
+          </div>
+          <div class="border-t pt-4">
+            <h6 class="font-semibold mb-2">Payment Instructions:</h6>
+            <ul class="text-sm text-gray-700 space-y-1">
+              <li>• M-PESA: Lipa na M-Pesa Buy Goods</li>
+              <li>• Till Number: 5626320</li>
+              <li>• Name: DR.NET TECHNOLOGY LABS</li>
+              <li>• Reference: ${invoice.invoiceNumber}</li>
+            </ul>
+          </div>
+        </div>
+      `;
+      
+      preview.classList.remove('hidden');
+    }
+
+    // SMS Templates
+    function generateSMSTemplate(type) {
+      const userId = document.getElementById('invoiceUserSelect').value;
+      if (!userId) {
+        Swal.fire('Error', 'Please select a user first', 'error');
+        return;
+      }
+
+      const user = users.find(u => u._id === userId);
+      if (!user) {
+        Swal.fire('Error', 'User not found', 'error');
+        return;
+      }
+
+      const invoiceData = {
+        invoiceNumber: 'INV-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
+        userName: user.name,
+        amount: user.subscriptionAmount,
+        dueDate: dayjs().add(7, 'days').format('YYYY-MM-DD'),
+        userPhone: user.phone
+      };
+
+      let smsContent = '';
+      
+      switch(type) {
+        case 'invoice':
+          smsContent = generateInvoiceMessage(invoiceData);
+          break;
+        case 'reminder':
+          smsContent = generateReminderMessage(invoiceData);
+          break;
+        case 'confirmation':
+          smsContent = generatePaymentConfirmation(invoiceData);
+          break;
+      }
+
+      showSMSPreview(smsContent);
+    }
+
+    function generateInvoiceMessage(invoice) {
+      const dueDate = dayjs(invoice.dueDate).format('MMM D, YYYY');
+      
+      return `Dear ${invoice.userName},
+
+Your DR.NET internet subscription has expired. 
+
+Invoice #${invoice.invoiceNumber}
+Amount Due: KSH ${invoice.amount.toLocaleString()}
+Due Date: ${dueDate}
+
+Please renew to continue enjoying our high-speed internet service.
+
+Payment via M-PESA:
+• Lipa na M-Pesa Buy Goods
+• Till Number: 5626320
+• Name: DR.NET TECHNOLOGY LABS
+• Reference: ${invoice.invoiceNumber}
+
+Contact us: 0701782354
+DR.NET TECHNOLOGY LABS`;
+    }
+
+    function generateReminderMessage(invoice) {
+      const daysOverdue = Math.floor((Date.now() - new Date(invoice.dueDate).getTime()) / (1000 * 60 * 60 * 24));
+      
+      return `REMINDER: ${invoice.userName}
+
+Your DR.NET subscription payment is ${daysOverdue} day(s) overdue.
+
+Invoice #${invoice.invoiceNumber}
+Amount: KSH ${invoice.amount.toLocaleString()}
+
+Please pay immediately to avoid service suspension.
+
+Pay via M-PESA:
+• Lipa na M-Pesa Buy Goods
+• Till Number: 5626320
+• Reference: ${invoice.invoiceNumber}
+
+DR.NET TECHNOLOGY LABS`;
+    }
+
+    function generatePaymentConfirmation(invoice) {
+      return `Payment Confirmed! 
+
+Thank you ${invoice.userName}!
+
+Invoice #${invoice.invoiceNumber} - PAID
+Amount: KSH ${invoice.amount.toLocaleString()}
+
+Your DR.NET internet service has been renewed for 30 days.
+
+Questions? Call 0701782354
+DR.NET TECHNOLOGY LABS`;
+    }
+
+    function showSMSPreview(content) {
+      currentSMSContent = content;
+      document.getElementById('smsPreviewContent').textContent = content;
+      document.getElementById('smsPreview').classList.remove('hidden');
+    }
+
+    function copySMSToClipboard() {
+      navigator.clipboard.writeText(currentSMSContent).then(() => {
+        Swal.fire('Copied!', 'SMS content copied to clipboard', 'success');
       });
     }
 
-    function renewUserWithAmount(userId, amount) {
-      const userIndex = users.findIndex(u => u._id === userId);
-      if (userIndex === -1) return;
-
-      const renewalDate = dayjs().format('YYYY-MM-DD');
-      const expiryDate = dayjs().add(30, 'days').format('YYYY-MM-DD');
-
-      // Update user
-      users[userIndex] = {
-        ...users[userIndex],
-        paymentDate: renewalDate,
-        expiryDate: expiryDate,
-        paidSubscription: true,
-        lastRenewalDate: renewalDate,
-        subscriptionAmount: amount
-      };
-
-      // Add renewal record
-      const renewal = {
+    // User registration
+    function submitUserForm(event) {
+      event.preventDefault();
+      
+      const formData = new FormData(event.target);
+      const userData = {
         _id: Date.now().toString(),
-        userId: userId,
-        userName: users[userIndex].name,
-        amount: amount,
-        renewalDate: renewalDate,
-        expiryDate: expiryDate,
-        month: dayjs().format('MMMM'),
-        year: dayjs().year(),
+        name: formData.get('name'),
+        phone: formData.get('phone'),
+        location: formData.get('location'),
+        subscriptionAmount: parseInt(formData.get('subscriptionAmount')),
+        routerCost: parseInt(formData.get('routerCost')),
+        paymentDate: formData.get('paymentDate'),
+        paidSubscription: formData.get('paidSubscription') === 'on',
+        package: formData.get('package'),
+        expiryDate: dayjs(formData.get('paymentDate')).add(30, 'days').format('YYYY-MM-DD'),
         isDeleted: false
       };
 
-      renewals.push(renewal);
-
-      // Refresh displays
-      renderDashboard();
-      renderManageUsers();
-      renderRenewals();
-
-      Swal.fire('Success', `${users[userIndex].name} renewed successfully`, 'success');
-    }
-
-    function softDeleteUser(userId) {
-      const user = users.find(u => u._id === userId);
-      if (!user) return;
-
-      Swal.fire({
-        title: `Deactivate ${user.name}?`,
-        text: 'This will remove them from active users and soft delete their renewals.',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, deactivate'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          // Soft delete user
-          const userIndex = users.findIndex(u => u._id === userId);
-          users[userIndex].isDeleted = true;
-
-          // Soft delete related renewals
-          renewals.forEach(r => {
-            if (r.userId === userId) {
-              r.isDeleted = true;
-            }
-          });
-
-          renderDashboard();
-          renderManageUsers();
-          renderRenewals();
-
-          Swal.fire('Deactivated', 'User has been deactivated successfully', 'success');
-        }
-      });
-    }
-
-    function showDetailedView(type) {
-      const container = document.getElementById("detailedViewContainer");
-      const title = document.getElementById("detailedViewTitle");
-      const content = document.getElementById("detailedViewContent");
+      users.push(userData);
+      updateDashboard();
+      populateUserSelects();
       
-      container.classList.remove("hidden");
+      Swal.fire('Success', 'User registered successfully!', 'success');
+      event.target.reset();
+    }
+
+    // Quick renewal
+    function processQuickRenewal() {
+      const userId = document.getElementById('renewalUserSelect').value;
+      const amount = document.getElementById('renewalAmount').value;
       
-      switch(type) {
-        case 'users':
-          title.textContent = "All Users";
-          content.innerHTML = generateUserTable(users.filter(u => !u.isDeleted));
-          break;
-        case 'active':
-          const activeUsers = users.filter(u => dayjs(u.expiryDate).isAfter(dayjs()) && !u.isDeleted);
-          title.textContent = "Active Users";
-          content.innerHTML = generateUserTable(activeUsers);
-          break;
-        case 'expired':
-          const expiredUsers = users.filter(u => dayjs(u.expiryDate).isBefore(dayjs()) && !u.isDeleted);
-          title.textContent = "Expired Users";
-          content.innerHTML = generateUserTable(expiredUsers);
-          break;
-        case 'monthly-income':
-          const currentMonthRenewals = renewals.filter(r => 
-            r.month === dayjs().format('MMMM') && 
-            r.year === dayjs().year() && 
-            !r.isDeleted
-          );
-          title.textContent = `Monthly Income Breakdown (${dayjs().format('MMMM YYYY')})`;
-          content.innerHTML = generateRenewalTable(currentMonthRenewals);
-          break;
-        case 'router':
-          const routerUsers = users.filter(u => u.routerCost > 0 && !u.isDeleted);
-          title.textContent = "Router Revenue";
-          content.innerHTML = generateRouterTable(routerUsers);
-          break;
-        case 'bookings':
-          title.textContent = "All Bookings";
-          content.innerHTML = generateBookingTable(bookings);
-          break;
-      }
-    }
-
-    function generateRenewalTable(renewalList) {
-      if (renewalList.length === 0) {
-        return '<div class="text-center text-gray-500 py-8">No renewals found for this month</div>';
-      }
-
-      return `
-        <table class="min-w-full table-auto">
-          <thead class="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white">
-            <tr>
-              <th class="px-4 py-3 text-left">User Name</th>
-              <th class="px-4 py-3 text-left">Amount</th>
-              <th class="px-4 py-3 text-left">Renewal Date</th>
-              <th class="px-4 py-3 text-left">Expiry Date</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200">
-            ${renewalList.map((renewal, index) => `
-              <tr class="${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:bg-yellow-50 transition-colors">
-                <td class="px-4 py-3 font-medium">${renewal.userName}</td>
-                <td class="px-4 py-3 font-bold text-green-600">Ksh ${renewal.amount.toLocaleString()}</td>
-                <td class="px-4 py-3">${dayjs(renewal.renewalDate).format('MMM DD, YYYY')}</td>
-                <td class="px-4 py-3">${dayjs(renewal.expiryDate).format('MMM DD, YYYY')}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      `;
-    }
-
-    function generateUserTable(userList) {
-      if (userList.length === 0) {
-        return '<div class="text-center text-gray-500 py-8">No users found</div>';
-      }
-
-      return `
-        <table class="min-w-full table-auto">
-          <thead class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-            <tr>
-              <th class="px-4 py-3 text-left">Name</th>
-              <th class="px-4 py-3 text-left">Phone</th>
-              <th class="px-4 py-3 text-left">Location</th>
-              <th class="px-4 py-3 text-left">Subscription</th>
-              <th class="px-4 py-3 text-left">Status</th>
-              <th class="px-4 py-3 text-left">Expiry</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200">
-            ${userList.map((user, index) => `
-              <tr class="${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:bg-indigo-50 transition-colors">
-                <td class="px-4 py-3 font-medium">${user.name}</td>
-                <td class="px-4 py-3">${user.phone}</td>
-                <td class="px-4 py-3">${user.location}</td>
-                <td class="px-4 py-3">
-                  <span class="px-2 py-1 text-xs rounded-full ${user.paidSubscription ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
-                    Ksh ${user.subscriptionAmount} (${user.paidSubscription ? 'Paid' : 'Unpaid'})
-                  </span>
-                </td>
-                <td class="px-4 py-3">
-                  <span class="px-2 py-1 text-xs rounded-full ${dayjs(user.expiryDate).isAfter(dayjs()) ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
-                    ${dayjs(user.expiryDate).isAfter(dayjs()) ? 'Active' : 'Expired'}
-                  </span>
-                </td>
-                <td class="px-4 py-3">${dayjs(user.expiryDate).format('MMM DD, YYYY')}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      `;
-    }
-
-    function generateRouterTable(routerUsers) {
-      if (routerUsers.length === 0) {
-        return '<div class="text-center text-gray-500 py-8">No router sales found</div>';
-      }
-
-      return `
-        <table class="min-w-full table-auto">
-          <thead class="bg-gradient-to-r from-purple-500 to-pink-600 text-white">
-            <tr>
-              <th class="px-4 py-3 text-left">Name</th>
-              <th class="px-4 py-3 text-left">Phone</th>
-              <th class="px-4 py-3 text-left">Location</th>
-              <th class="px-4 py-3 text-left">Router Cost</th>
-              <th class="px-4 py-3 text-left">Purchase Date</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200">
-            ${routerUsers.map((user, index) => `
-              <tr class="${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:bg-purple-50 transition-colors">
-                <td class="px-4 py-3 font-medium">${user.name}</td>
-                <td class="px-4 py-3">${user.phone}</td>
-                <td class="px-4 py-3">${user.location}</td>
-                <td class="px-4 py-3 font-bold text-purple-600">Ksh ${parseFloat(user.routerCost).toLocaleString()}</td>
-                <td class="px-4 py-3">${dayjs(user.paymentDate).format('MMM DD, YYYY')}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      `;
-    }
-
-    function generateBookingTable(bookingList) {
-      if (bookingList.length === 0) {
-        return '<div class="text-center text-gray-500 py-8">No bookings found</div>';
-      }
-
-      return `
-        <div class="space-y-4">
-          ${bookingList.map((booking, index) => `
-            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-200">
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <h4 class="text-lg font-semibold text-blue-800 mb-2">Customer Info</h4>
-                  <p><strong>Name:</strong> ${booking.fullName || booking.name || 'N/A'}</p>
-                  <p><strong>Phone:</strong> ${booking.phone || 'N/A'}</p>
-                  <p><strong>Email:</strong> ${booking.email || 'N/A'}</p>
-                  <p><strong>Location:</strong> ${booking.location || booking.address || 'N/A'}</p>
-                </div>
-                <div>
-                  <h4 class="text-lg font-semibold text-blue-800 mb-2">Service Details</h4>
-                  <p><strong>Service:</strong> ${booking.serviceType || booking.service || 'N/A'}</p>
-                  <p><strong>Package:</strong> ${booking.package || booking.packageType || 'N/A'}</p>
-                  <p><strong>Installation:</strong> ${booking.installationDate ? dayjs(booking.installationDate).format('MMM DD, YYYY') : 'N/A'}</p>
-                  <p><strong>Time:</strong> ${booking.preferredTime || 'N/A'}</p>
-                </div>
-                <div>
-                  <h4 class="text-lg font-semibold text-blue-800 mb-2">Status & Actions</h4>
-                  <div class="space-y-2">
-                    <select onchange="updateBookingStatus(${index}, this.value)" class="w-full p-2 border rounded">
-                      <option value="pending" ${booking.status === 'pending' ? 'selected' : ''}>Pending</option>
-                      <option value="confirmed" ${booking.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
-                      <option value="in_progress" ${booking.status === 'in_progress' ? 'selected' : ''}>In Progress</option>
-                      <option value="completed" ${booking.status === 'completed' ? 'selected' : ''}>Completed</option>
-                      <option value="cancelled" ${booking.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
-                    </select>
-                    <div class="flex space-x-2">
-                      <button onclick="contactCustomer('${booking.phone}', '${booking.fullName || booking.name}')" class="bg-green-500 text-white px-3 py-1 rounded text-sm">📞 Contact</button>
-                      <button onclick="deleteBooking('${booking._id || booking.id}', ${index})" class="bg-red-500 text-white px-3 py-1 rounded text-sm">🗑️ Delete</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              ${booking.message || booking.notes ? `
-                <div class="mt-4 bg-white p-3 rounded border-l-4 border-blue-500">
-                  <strong>Message:</strong> ${booking.message || booking.notes}
-                </div>
-              ` : ''}
-            </div>
-          `).join('')}
-        </div>
-      `;
-    }
-
-    function hideDetailedView() {
-      document.getElementById("detailedViewContainer").classList.add("hidden");
-    }
-
-    function renderManageUsers() {
-      const container = document.getElementById("manageUserList");
-      const activeUsers = users.filter(u => !u.isDeleted);
-      
-      container.innerHTML = activeUsers.map((u, i) => {
-        const isActive = dayjs(u.expiryDate).isAfter(dayjs());
-        const statusColor = isActive ? 'text-green-600' : 'text-red-600';
-        const statusText = isActive ? 'Active' : 'Expired';
-        
-        return `
-          <div class="p-4 bg-white rounded-lg shadow-md flex justify-between items-center">
-            <div>
-              <p class="font-semibold">${u.name}</p>
-              <p class="text-sm text-gray-600">${u.phone} - ${u.location}</p>
-              <p class="text-xs text-gray-500">Payment: ${dayjs(u.paymentDate).format('MMM DD, YYYY')} | Expires: ${dayjs(u.expiryDate).format('MMM DD, YYYY')}</p>
-              <p class="text-xs ${u.paidSubscription ? 'text-green-600' : 'text-red-600'}">Subscription: ${u.paidSubscription ? 'Paid' : 'Unpaid'} - Ksh ${u.subscriptionAmount}</p>
-              <p class="text-xs font-medium ${statusColor}">Status: ${statusText}</p>
-            </div>
-            <div class="space-x-2">
-              <button onclick="editUser(${i})" class="bg-blue-500 text-white px-2 py-1 rounded text-sm">Edit</button>
-              <button onclick="renewUser(${i})" class="bg-green-500 text-white px-2 py-1 rounded text-sm">Renew</button>
-              <button onclick="deleteUser('${u._id}')" class="bg-red-500 text-white px-2 py-1 rounded text-sm">Delete</button>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function renderBookings() {
-      const container = document.getElementById("bookingList");
-      if (bookings.length === 0) {
-        container.innerHTML = '<div class="text-center text-gray-500 py-8">No bookings found</div>';
+      if (!userId || !amount) {
+        Swal.fire('Error', 'Please select a user and enter renewal amount', 'error');
         return;
       }
+
+      const user = users.find(u => u._id === userId);
+      if (!user) {
+        Swal.fire('Error', 'User not found', 'error');
+        return;
+      }
+
+      user.subscriptionAmount = parseInt(amount);
+      user.paidSubscription = true;
+      user.paymentDate = dayjs().format('YYYY-MM-DD');
+      user.expiryDate = dayjs().add(30, 'days').format('YYYY-MM-DD');
+
+      updateDashboard();
+      Swal.fire('Success', `${user.name} renewed successfully!`, 'success');
       
-      container.innerHTML = bookings.map((booking, i) => `
-        <div class="p-6 bg-white rounded-lg shadow-md border border-gray-200">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      document.getElementById('renewalAmount').value = '';
+    }
+
+    // Manage users
+    function loadManageUsers() {
+      const container = document.getElementById('manageUserList');
+      container.innerHTML = '';
+
+      users.filter(u => !u.isDeleted).forEach(user => {
+        const userCard = document.createElement('div');
+        userCard.className = 'card-enhanced p-6 rounded-xl hover-lift';
+        userCard.innerHTML = `
+          <div class="flex justify-between items-center">
             <div>
-              <h4 class="text-lg font-semibold text-indigo-700 mb-2">Customer Information</h4>
-              <p class="mb-1"><strong>Name:</strong> ${booking.fullName || booking.name || 'N/A'}</p>
-              <p class="mb-1"><strong>Phone:</strong> ${booking.phone || 'N/A'}</p>
-              <p class="mb-1"><strong>Email:</strong> ${booking.email || 'N/A'}</p>
-              <p class="mb-1"><strong>Location:</strong> ${booking.location || booking.address || 'N/A'}</p>
+              <h5 class="font-semibold text-lg">${user.name}</h5>
+              <p class="text-gray-600">${user.phone} • ${user.location}</p>
+              <p class="text-sm text-gray-500">${user.package}</p>
+              <div class="flex items-center mt-2">
+                <span class="px-3 py-1 text-xs rounded-full ${user.paidSubscription ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
+                  ${user.paidSubscription ? 'Paid' : 'Unpaid'}
+                </span>
+                <span class="ml-2 text-sm text-gray-600">Expires: ${formatDate(user.expiryDate)}</span>
+              </div>
             </div>
-            <div>
-              <h4 class="text-lg font-semibold text-indigo-700 mb-2">Service Details</h4>
-              <p class="mb-1"><strong>Service Type:</strong> ${booking.serviceType || booking.service || 'N/A'}</p>
-              <p class="mb-1"><strong>Package:</strong> ${booking.package || booking.packageType || 'N/A'}</p>
-              <p class="mb-1"><strong>Installation Date:</strong> ${booking.installationDate ? dayjs(booking.installationDate).format('MMM DD, YYYY') : 'N/A'}</p>
-              <p class="mb-1"><strong>Preferred Time:</strong> ${booking.preferredTime || 'N/A'}</p>
-            </div>
-          </div>
-          
-          ${booking.message || booking.notes ? `
-            <div class="mt-4">
-              <h4 class="text-lg font-semibold text-indigo-700 mb-2">Additional Information</h4>
-              <p class="text-gray-700 bg-gray-50 p-3 rounded">${booking.message || booking.notes}</p>
-            </div>
-          ` : ''}
-          
-          <div class="mt-4 flex justify-between items-center">
-            <div class="text-sm text-gray-500">
-              <p><strong>Booking ID:</strong> ${booking._id || booking.id || 'N/A'}</p>
-              <p><strong>Created:</strong> ${booking.createdAt ? dayjs(booking.createdAt).format('MMM DD, YYYY HH:mm') : 'N/A'}</p>
-            </div>
-            <div class="space-x-2">
-              <button onclick="contactCustomer('${booking.phone}', '${booking.fullName || booking.name}')" 
-                      class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition">
-                📞 Contact
-              </button>
-              <select onchange="updateBookingStatusInline(${i}, this.value)" class="bg-blue-500 text-white px-3 py-1 rounded">
-                <option value="pending" ${booking.status === 'pending' ? 'selected' : ''}>Pending</option>
-                <option value="confirmed" ${booking.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
-                <option value="in_progress" ${booking.status === 'in_progress' ? 'selected' : ''}>In Progress</option>
-                <option value="completed" ${booking.status === 'completed' ? 'selected' : ''}>Completed</option>
-                <option value="cancelled" ${booking.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
-              </select>
-              <button onclick="deleteBooking('${booking._id || booking.id}', ${i})" 
-                      class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition">
+            <div class="text-right">
+              <p class="font-bold text-lg">KSH ${user.subscriptionAmount.toLocaleString()}</p>
+              <button onclick="deleteUser('${user._id}')" class="mt-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition text-sm">
                 🗑️ Delete
               </button>
             </div>
           </div>
-          
-          ${booking.status ? `
-            <div class="mt-2">
-              <span class="inline-block px-2 py-1 text-xs rounded ${
-                booking.status === 'completed' ? 'bg-green-100 text-green-800' :
-                booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                booking.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                'bg-gray-100 text-gray-800'
-              }">
-                Status: ${booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
-              </span>
-            </div>
-          ` : ''}
-        </div>
-      `).join('');
-    }
-
-    function editUser(index) {
-      const activeUsers = users.filter(u => !u.isDeleted);
-      const user = activeUsers[index];
-      const originalIndex = users.findIndex(u => u._id === user._id);
-      
-      Swal.fire({
-        title: 'Edit User',
-        html: `
-          <input id="editName" class="swal2-input" placeholder="Name" value="${user.name}">
-          <input id="editPhone" class="swal2-input" placeholder="Phone" value="${user.phone}">
-          <input id="editLocation" class="swal2-input" placeholder="Location" value="${user.location}">
-          <input id="editSubscription" class="swal2-input" type="number" placeholder="Subscription Amount" value="${user.subscriptionAmount}">
-          <div class="swal2-checkbox">
-            <input type="checkbox" id="editPaidSubscription" ${user.paidSubscription ? 'checked' : ''}>
-            <label for="editPaidSubscription">Paid Subscription</label>
-          </div>
-        `,
-        confirmButtonText: 'Save',
-        showCancelButton: true,
-        preConfirm: () => {
-          const updated = {
-            name: document.getElementById("editName").value,
-            phone: document.getElementById("editPhone").value,
-            location: document.getElementById("editLocation").value,
-            subscriptionAmount: parseFloat(document.getElementById("editSubscription").value),
-            paidSubscription: document.getElementById("editPaidSubscription").checked
-          };
-
-          users[originalIndex] = { ...users[originalIndex], ...updated };
-          renderManageUsers();
-          renderDashboard();
-          Swal.fire('Updated!', 'User information updated successfully', 'success');
-        }
+        `;
+        container.appendChild(userCard);
       });
     }
 
-    function deleteUser(id) {
+    function deleteUser(userId) {
       Swal.fire({
-        title: 'Delete User?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, delete it!'
-      }).then(result => {
-        if (result.isConfirmed) {
-          users = users.filter(u => u._id !== id);
-          renewals = renewals.filter(r => r.userId !== id);
-          renderManageUsers();
-          renderDashboard();
-          renderRenewals();
-          Swal.fire('Deleted!', 'User deleted successfully', 'success');
-        }
-      });
-    }
-
-    function navigateTo(id) {
-      document.querySelectorAll('main > section').forEach(section => section.classList.add('hidden'));
-      document.getElementById(id).classList.remove('hidden');
-      
-      if (id === 'website-bookings') {
-        renderBookings();
-      } else if (id === 'renewals') {
-        renderRenewals();
-      }
-    }
-
-function logout() {
-  Swal.fire('Logged Out', 'You have successfully logged out.', 'info').then(() => {
-    // Redirect to the login page
-    window.location.href = 'admin-login.html';
-  });
-}
-
-    function submitUserForm(e) {
-      e.preventDefault();
-      const form = e.target;
-      const data = Object.fromEntries(new FormData(form));
-      data.subscriptionAmount = parseFloat(data.subscriptionAmount);
-      data.routerCost = parseFloat(data.routerCost);
-      data.paidSubscription = data.paidSubscription === 'on';
-      data.expiryDate = dayjs(data.paymentDate).add(30, 'days').format('YYYY-MM-DD');
-      data._id = Date.now().toString();
-      data.isDeleted = false;
-
-      users.push(data);
-
-      // If subscription is paid, add to renewals
-      if (data.paidSubscription) {
-        const renewal = {
-          _id: Date.now().toString() + '_renewal',
-          userId: data._id,
-          userName: data.name,
-          amount: data.subscriptionAmount,
-          renewalDate: data.paymentDate,
-          expiryDate: data.expiryDate,
-          month: dayjs(data.paymentDate).format('MMMM'),
-          year: dayjs(data.paymentDate).year(),
-          isDeleted: false
-        };
-        renewals.push(renewal);
-      }
-
-      form.reset();
-      renderDashboard();
-      renderManageUsers();
-      renderRenewals();
-      Swal.fire('Success', '✅ User registered successfully', 'success');
-    }
-
-    async function renewUser(index) {
-      const activeUsers = users.filter(u => !u.isDeleted);
-      const user = activeUsers[index];
-      const originalIndex = users.findIndex(u => u._id === user._id);
-      
-      const { value: renewalData } = await Swal.fire({
-        title: `Renew ${user.name}`,
-        html: `
-          <input id="renewAmount" type="number" placeholder="New Subscription Amount" class="swal2-input" required value="${user.subscriptionAmount}">
-          <input id="renewDate" type="date" class="swal2-input" required value="${dayjs().format('YYYY-MM-DD')}">
-          <div class="swal2-checkbox">
-            <input type="checkbox" id="renewPaidSubscription" checked>
-            <label for="renewPaidSubscription">Mark as Paid</label>
-          </div>
-        `,
-        confirmButtonText: 'Renew Now',
-        showCancelButton: true,
-        preConfirm: () => {
-          const subscriptionAmount = parseFloat(document.getElementById("renewAmount").value);
-          const paymentDate = document.getElementById("renewDate").value;
-          const paidSubscription = document.getElementById("renewPaidSubscription").checked;
-          const expiryDate = dayjs(paymentDate).add(30, 'days').format('YYYY-MM-DD');
-
-          return {
-            subscriptionAmount,
-            paymentDate,
-            expiryDate,
-            paidSubscription
-          };
-        }
-      });
-
-      if (renewalData) {
-        users[originalIndex] = { ...users[originalIndex], ...renewalData, lastRenewalDate: renewalData.paymentDate };
-
-        // Add renewal record
-        if (renewalData.paidSubscription) {
-          const renewal = {
-            _id: Date.now().toString(),
-            userId: user._id,
-            userName: user.name,
-            amount: renewalData.subscriptionAmount,
-            renewalDate: renewalData.paymentDate,
-            expiryDate: renewalData.expiryDate,
-            month: dayjs(renewalData.paymentDate).format('MMMM'),
-            year: dayjs(renewalData.paymentDate).year(),
-            isDeleted: false
-          };
-          renewals.push(renewal);
-        }
-
-        renderDashboard();
-        renderManageUsers();
-        renderRenewals();
-        Swal.fire('✅ Renewed!', 'User subscription renewed successfully', 'success');
-      }
-    }
-
-    async function refreshBookings() {
-      try {
-        const response = await fetch(`${BASE_URL}/api/bookings`);
-        bookings = await response.json();
-        renderBookings();
-        renderDashboard();
-        Swal.fire({
-          title: 'Refreshed!',
-          text: 'Bookings data has been updated',
-          icon: 'success',
-          timer: 1500,
-          showConfirmButton: false
-        });
-      } catch (error) {
-        console.error('Error refreshing bookings:', error);
-        Swal.fire('Error', 'Failed to refresh bookings', 'error');
-      }
-    }
-
-    function contactCustomer(phone, name) {
-      Swal.fire({
-        title: `Contact ${name}`,
-        html: `
-          <p class="mb-4">Phone: <strong>${phone}</strong></p>
-          <div class="space-y-2">
-            <button onclick="window.open('tel:${phone}')" class="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-              📞 Call Customer
-            </button>
-            <button onclick="window.open('sms:${phone}')" class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-              💬 Send SMS
-            </button>
-            <button onclick="window.open('https://wa.me/${phone.replace(/[^0-9]/g, '')}')" class="w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-              📱 WhatsApp
-            </button>
-          </div>
-        `,
-        showConfirmButton: false,
-        showCloseButton: true
-      });
-    }
-
-    function updateBookingStatus(index, status) {
-      bookings[index].status = status;
-      renderBookings();
-      showDetailedView('bookings');
-      Swal.fire('Updated!', 'Booking status has been updated', 'success');
-    }
-
-    function updateBookingStatusInline(index, status) {
-      updateBookingStatus(index, status);
-    }
-
-    function deleteBooking(id, index) {
-      Swal.fire({
-        title: 'Delete Booking?',
-        text: 'This action cannot be undone!',
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
         cancelButtonColor: '#3085d6',
         confirmButtonText: 'Yes, delete it!'
-      }).then(result => {
+      }).then((result) => {
         if (result.isConfirmed) {
-          bookings.splice(index, 1);
-          renderBookings();
-          renderDashboard();
-          Swal.fire('Deleted!', 'Booking has been deleted.', 'success');
+          const user = users.find(u => u._id === userId);
+          if (user) {
+            user.isDeleted = true;
+            updateDashboard();
+            loadManageUsers();
+            populateUserSelects();
+            Swal.fire('Deleted!', 'User has been deleted.', 'success');
+          }
         }
       });
     }
 
-    let incomeChart;
-
-    function drawIncomeChart() {
-      const monthlyTotals = {};
-
-      renewals
-        .filter(r => !r.isDeleted)
-        .forEach(r => {
-          const monthYear = `${r.month} ${r.year}`;
-          monthlyTotals[monthYear] = (monthlyTotals[monthYear] || 0) + r.amount;
+    // Load renewals data
+    function loadRenewalsData() {
+      populateUserSelects();
+      
+      const now = new Date();
+      const fiveDaysFromNow = new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000);
+      
+      // Users expiring soon
+      const expiringSoon = users.filter(user => 
+        !user.isDeleted && 
+        new Date(user.expiryDate) > now && 
+        new Date(user.expiryDate) <= fiveDaysFromNow
+      );
+      
+      if (expiringSoon.length > 0) {
+        document.getElementById('expiringSoonSection').classList.remove('hidden');
+        const list = document.getElementById('expiringSoonList');
+        list.innerHTML = '';
+        
+        expiringSoon.forEach(user => {
+          const item = document.createElement('div');
+          item.className = 'p-4 bg-yellow-50 rounded-lg border border-yellow-200';
+          item.innerHTML = `
+            <div class="flex justify-between items-center">
+              <div>
+                <p class="font-semibold">${user.name}</p>
+                <p class="text-sm text-gray-600">Expires: ${formatDate(user.expiryDate)}</p>
+              </div>
+              <span class="text-lg font-bold text-yellow-700">KSH ${user.subscriptionAmount.toLocaleString()}</span>
+            </div>
+          `;
+          list.appendChild(item);
         });
-
-      const labels = Object.keys(monthlyTotals);
-      const data = Object.values(monthlyTotals);
-
-      const ctx = document.getElementById('incomeChart').getContext('2d');
-
-      if (incomeChart) incomeChart.destroy();
-
-      incomeChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels,
-          datasets: [{
-            label: 'KES Income',
-            data,
-            backgroundColor: 'rgba(79, 70, 229, 0.8)'
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { display: false } }
-        }
+      }
+      
+      // Dormant users (expired)
+      const dormant = users.filter(user => 
+        !user.isDeleted && new Date(user.expiryDate) <= now
+      );
+      
+      if (dormant.length > 0) {
+        document.getElementById('dormantUsersSection').classList.remove('hidden');
+        const list = document.getElementById('dormantUsersList');
+        list.innerHTML = '';
+        
+        dormant.forEach(user => {
+          const item = document.createElement('div');
+          item.className = 'p-4 bg-red-50 rounded-lg border border-red-200';
+          item.innerHTML = `
+            <div class="flex justify-between items-center">
+              <div>
+                <p class="font-semibold">${user.name}</p>
+                <p class="text-sm text-gray-600">Expired: ${formatDate(user.expiryDate)}</p>
+              </div>
+              <span class="text-lg font-bold text-red-700">KSH ${user.subscriptionAmount.toLocaleString()}</span>
+            </div>
+          `;
+          list.appendChild(item);
+        });
+      }
+      
+      // Calculate renewals summary
+      const currentMonth = dayjs().format('YYYY-MM');
+      const monthlyRenewals = users.filter(user => 
+        !user.isDeleted && 
+        user.paidSubscription && 
+        user.paymentDate && 
+        user.paymentDate.startsWith(currentMonth)
+      );
+      
+      document.getElementById('renewalsCount').textContent = monthlyRenewals.length;
+      const renewalsRevenue = monthlyRenewals.reduce((sum, user) => sum + user.subscriptionAmount, 0);
+      document.getElementById('renewalsRevenue').textContent = `Ksh ${renewalsRevenue.toLocaleString()}`;
+      document.getElementById('renewalsAverage').textContent = monthlyRenewals.length > 0 ? Math.round(renewalsRevenue / monthlyRenewals.length) : 0;
+      
+      // Recent renewals
+      const recentList = document.getElementById('recentRenewalsList');
+      recentList.innerHTML = '';
+      
+      monthlyRenewals.slice(0, 5).forEach(user => {
+        const item = document.createElement('div');
+        item.className = 'flex justify-between items-center p-3 bg-gray-50 rounded-lg';
+        item.innerHTML = `
+          <span class="font-medium">${user.name}</span>
+          <span class="text-green-600 font-semibold">KSH ${user.subscriptionAmount.toLocaleString()}</span>
+        `;
+        recentList.appendChild(item);
       });
     }
 
+    // Load bookings
+    function loadBookings() {
+      const container = document.getElementById('bookingList');
+      container.innerHTML = '';
+
+      bookings.forEach(booking => {
+        const bookingCard = document.createElement('div');
+        bookingCard.className = 'card-enhanced p-6 rounded-xl hover-lift';
+        bookingCard.innerHTML = `
+          <div class="flex justify-between items-start">
+            <div>
+              <h5 class="font-semibold text-lg">${booking.name}</h5>
+              <p class="text-gray-600">${booking.email}</p>
+              <p class="text-gray-600">${booking.phone}</p>
+              <p class="text-sm text-gray-500 mt-2"><strong>Location:</strong> ${booking.location}</p>
+              <p class="text-sm text-gray-500"><strong>Package:</strong> ${booking.package}</p>
+              <p class="text-sm text-gray-500 mt-2">${booking.message}</p>
+            </div>
+            <div class="text-right">
+              <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
+                ${formatDate(booking.date)}
+              </span>
+            </div>
+          </div>
+        `;
+        container.appendChild(bookingCard);
+      });
+    }
+
+    function refreshBookings() {
+      loadBookings();
+      Swal.fire('Refreshed', 'Bookings have been refreshed', 'success');
+    }
+
+    // Export to CSV
+    function exportToCSV() {
+      const csvContent = "data:text/csv;charset=utf-8," 
+        + "Name,Phone,Location,Package,Subscription Amount,Router Cost,Payment Date,Expiry Date,Status\n"
+        + users.filter(u => !u.isDeleted).map(user => 
+          `"${user.name}","${user.phone}","${user.location}","${user.package}","${user.subscriptionAmount}","${user.routerCost || 0}","${user.paymentDate}","${user.expiryDate}","${user.paidSubscription ? 'Paid' : 'Unpaid'}"`
+        ).join('\n');
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `dr-net-users-${dayjs().format('YYYY-MM-DD')}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      Swal.fire('Success', 'Users exported to CSV successfully!', 'success');
+    }
+
+    // Detailed views
+    function showDetailedView(type) {
+      const container = document.getElementById('detailedViewContainer');
+      const title = document.getElementById('detailedViewTitle');
+      const content = document.getElementById('detailedViewContent');
+      
+      let data = [];
+      let titleText = '';
+      
+      switch(type) {
+        case 'users':
+          data = users.filter(u => !u.isDeleted);
+          titleText = 'All Users';
+          break;
+        case 'active':
+          data = users.filter(u => !u.isDeleted && new Date(u.expiryDate) > new Date());
+          titleText = 'Active Users';
+          break;
+        case 'expired':
+          data = users.filter(u => !u.isDeleted && new Date(u.expiryDate) <= new Date());
+          titleText = 'Expired Users';
+          break;
+        default:
+          return;
+      }
+      
+      title.textContent = titleText;
+      
+      if (data.length === 0) {
+        content.innerHTML = '<p class="text-gray-500 text-center py-8">No users found in this category.</p>';
+      } else {
+        const table = `
+          <table class="min-w-full table-auto">
+            <thead>
+              <tr class="bg-gray-50">
+                <th class="px-4 py-3 text-left font-semibold">Name</th>
+                <th class="px-4 py-3 text-left font-semibold">Phone</th>
+                <th class="px-4 py-3 text-left font-semibold">Location</th>
+                <th class="px-4 py-3 text-left font-semibold">Amount</th>
+                <th class="px-4 py-3 text-left font-semibold">Expiry</th>
+                <th class="px-4 py-3 text-left font-semibold">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${data.map(user => `
+                <tr class="border-b hover:bg-gray-50">
+                  <td class="px-4 py-3 font-medium">${user.name}</td>
+                  <td class="px-4 py-3">${user.phone}</td>
+                  <td class="px-4 py-3">${user.location}</td>
+                  <td class="px-4 py-3">KSH ${user.subscriptionAmount.toLocaleString()}</td>
+                  <td class="px-4 py-3">${formatDate(user.expiryDate)}</td>
+                  <td class="px-4 py-3">
+                    <span class="px-2 py-1 text-xs rounded-full ${user.paidSubscription ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
+                      ${user.paidSubscription ? 'Paid' : 'Unpaid'}
+                    </span>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+        content.innerHTML = table;
+      }
+      
+      container.classList.remove('hidden');
+      container.classList.add('fade-in-up');
+    }
+
+    function hideDetailedView() {
+      document.getElementById('detailedViewContainer').classList.add('hidden');
+    }
+
+    // Utility functions
+    function formatDate(dateString) {
+      return dayjs(dateString).format('MMM D, YYYY');
+    }
+
+    function logout() {
+      Swal.fire({
+        title: 'Logout?',
+        text: 'Are you sure you want to logout?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, logout'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire('Goodbye!', 'You have been logged out.', 'success');
+          // Add actual logout logic here
+        }
+      });
+    }
   </script>
 </body>
 </html>
